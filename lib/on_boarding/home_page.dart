@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class MyHomePage01 extends StatefulWidget {
-  const MyHomePage01({Key? key}) : super(key: key);
+  const MyHomePage01({super.key});
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage01>
-    with SingleTickerProviderStateMixin {
+class _MyHomePageState extends State<MyHomePage01> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late Animation<Offset> _slideAnimation;
   bool _isDrawerOpen = false;
   int _selectedIndex = 0;
 
@@ -20,21 +17,24 @@ class _MyHomePageState extends State<MyHomePage01>
     super.initState();
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 500),
+      reverseDuration: const Duration(milliseconds: 500),
     );
 
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0.0, 0.0),
-      end: const Offset(2.8, 0.0),
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    // _slideAnimation = Tween<Offset>(
+    //   begin: const Offset(0.0, 0.0),
+    //   end: const Offset(2.8, 0.0),
+    // ).animate(CurvedAnimation(
+    //   parent: _animationController,
+    //   curve: Curves.easeInOut,
+    // ));
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    if(mounted) {
+      _animationController.dispose();
+    }
     super.dispose();
   }
 
@@ -62,65 +62,64 @@ class _MyHomePageState extends State<MyHomePage01>
         children: [
           Row(
             children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.horizontal(
-                  right: Radius.circular(20.0),
-                ),
-                clipBehavior: Clip.none,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 300),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 3000),
+                child: Drawer(
                   width: _isDrawerOpen ? 220 : 60,
-                  child: Drawer(
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      children: <Widget>[
-                        if (_isDrawerOpen)
-                          const DrawerHeader(
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 91, 50, 162),
+                  child: ListView(
+                  padding: EdgeInsets.zero,
+                    children: <Widget>[
+                      FloatingActionButton(
+                        onPressed: _toggleDrawer,
+                        child: Icon(_isDrawerOpen ? Icons.arrow_back : Icons.menu),
+                      ),
+                    if (_isDrawerOpen)
+                      const DrawerHeader(
+                        padding: EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                          color: Color.fromARGB(255, 91, 50, 162),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          //crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 30,
+                              child: Icon(Icons.person),
                             ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                CircleAvatar(
-                                  radius: 30,
-                                  child: Icon(Icons.person),
-                                ),
-                                SizedBox(height: 10),
-                                Text(
-                                  'Nome do Usuário',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ],
+                            //SizedBox(height: 10),
+                            Text(
+                              'Nome do Usuário',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                              ),
                             ),
-                          ),
-                        if (_isDrawerOpen)
-                          ListTile(
-                            title: const Text('Página 1'),
-                            onTap: () {
-                              _onItemTapped(0);
-                            },
-                          ),
-                        if (_isDrawerOpen)
-                          ListTile(
-                            title: const Text('Página 2'),
-                            onTap: () {
-                              _onItemTapped(1);
-                            },
-                          ),
-                        if (_isDrawerOpen)
-                          ListTile(
-                            title: const Text('Página 3'),
-                            onTap: () {
-                              _onItemTapped(2);
-                            },
-                          ),
-                      ],
-                    ),
+                          ],
+                        ),
+                      ),
+                    if (_isDrawerOpen)
+                      ListTile(
+                        title: const Text('Página 1'),
+                        onTap: () {
+                          _onItemTapped(0);
+                        },
+                      ),
+                    if (_isDrawerOpen)
+                      ListTile(
+                        title: const Text('Página 2'),
+                        onTap: () {
+                          _onItemTapped(1);
+                        },
+                      ),
+                    if (_isDrawerOpen)
+                      ListTile(
+                        title: const Text('Página 3'),
+                        onTap: () {
+                          _onItemTapped(2);
+                        },
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -132,17 +131,16 @@ class _MyHomePageState extends State<MyHomePage01>
               ),
             ],
           ),
-          Positioned(
-            bottom: 16.0,
-            child: SlideTransition(
-              position: _slideAnimation,
-              child: FloatingActionButton(
-                onPressed: _toggleDrawer,
-
-                child: Icon(_isDrawerOpen ? Icons.arrow_back : Icons.menu),
-              ),
-            ),
-          ),
+          // Positioned(
+          //   bottom: 16.0,
+          //   child: SlideTransition(
+          //     position: _slideAnimation,
+          //     child: FloatingActionButton(
+          //       onPressed: _toggleDrawer,
+          //       child: Icon(_isDrawerOpen ? Icons.arrow_back : Icons.menu),
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );

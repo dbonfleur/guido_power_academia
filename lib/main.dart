@@ -54,6 +54,13 @@ class _MyHomePageState extends State<MyHomePage> {
 class MySlideShow extends StatelessWidget {
   const MySlideShow({super.key});
 
+  void _navigateToHomePage(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const MyHomePage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -122,10 +129,7 @@ class MySlideShow extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const MyHomePage()),
-                      );
+                      _navigateToHomePage(context);
                   },
                   child: const Text("Pular"),
                 ),
