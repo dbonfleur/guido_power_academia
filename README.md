@@ -1,17 +1,16 @@
-# Guido Power Academia
+# guido_power_academia
 
-Este é o projeto "Guido Power Academia", um aplicativo desenvolvido em Flutter para gerenciar informações e tarefas relacionadas a uma academia.
+A new Flutter project.
 
-## Visão geral do Projeto
+## Getting Started
 
-O aplicativo permite que os usuários tenham acesso a diferentes funcionalidades, como:
-- Visualização de treinos personalizados
-- Agendamento de aulas
-- Acompanhamento do progresso do treino
-- Visualização de informações sobre os instrutores
-- E muito mais!
+This project is a starting point for a Flutter application.
 
-## Configuração do Ambiente de Desenvolvimento
+A few resources to get you started if this is your first Flutter project:
 
-1. Após clonar o projeto em sua máquina execute:  flutter pub get
-2. Depois de baixar as dependências, execute selecionando o Chrome: flutter run
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

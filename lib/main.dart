@@ -1,142 +1,64 @@
-
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_carousel_intro/flutter_carousel_intro.dart';
-import 'package:flutter_carousel_intro/slider_item_model.dart';
-import 'package:flutter_carousel_intro/utils/enums.dart';
-import 'on_boarding/home_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'blocs/authentication/authentication_bloc.dart';
+import 'blocs/registration/registration_bloc.dart';
+import 'blocs/theme/theme_bloc.dart';
+import 'blocs/theme/theme_state.dart';
+import 'blocs/user/user_bloc.dart';
+import 'repositories/user_repository.dart';
+import 'services/database_helper.dart';
+import 'screens/login_screen.dart';
+import 'screens/registration_screen.dart';
+import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+
+  final userRepository = UserRepository(DatabaseHelper.instance);
+  runApp(MyApp(userRepository: userRepository));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final UserRepository userRepository;
+
+  const MyApp({super.key, required this.userRepository});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Guido Power Academia',
-      theme: ThemeData(useMaterial3: true),
-      debugShowCheckedModeBanner: false,
-      home: const IntrodPage(),
-    );
-  }
-}
-
-class IntrodPage extends StatelessWidget {
-  const IntrodPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: MySlideShow(),
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: MyHomePage01(),
-    );
-  }
-}
-
-class MySlideShow extends StatelessWidget {
-  const MySlideShow({super.key});
-
-  void _navigateToHomePage(BuildContext context) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MyHomePage()),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: FlutterCarouselIntro(
-        animatedRotateX: true,
-        animatedRotateZ: true,
-        scale: true,
-        autoPlay: true,
-        animatedOpacity: true,
-        autoPlaySlideDuration: const Duration(seconds: 9),
-        autoPlaySlideDurationTransition: const Duration(milliseconds: 1100),
-        primaryColor: const Color.fromARGB(255, 59, 23, 95),
-        secondaryColor: Colors.grey,
-        scrollDirection: Axis.vertical,
-        // indicatorAlign: IndicatorAlign.bottom,
-        indicatorEffect: IndicatorEffects.worm,
-        showIndicators: true,
-        slides: [
-          SliderItem(
-            title: 'Bem-vindo à Guido Power Academia!',
-            titleTextStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-              height: 2,
-              color: Color.fromARGB(255, 65, 36, 114), // Sublinhar o texto
-            ),
-            subtitle: const Text(
-              'Entre, treine e transforme-se conosco. Estamos aqui para ajudá-lo a alcançar seus objetivos de forma dedicada e motivadora.',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
-            ),
-            widget: Image.asset("academia_pesos.png"),
-          ),
-          SliderItem(
-            title: 'Serviços Oferecidos!',
-            titleTextStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-              //height: -7,
-              color: Color.fromARGB(255, 65, 36, 114), 
-            ),
-            subtitle: const Text(
-              '1.Musculação\n2.Cardio\n3.Aulas em Grupo (Zumba, Pilates, Box)\n4.Personal Trainer',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
-            ),
-            widget: Image.asset(
-              "academia_esteira.png",
-              alignment: Alignment.topCenter,
-            ),
-          ),
-          SliderItem(
-            title: 'Vamos começar!',
-            titleTextStyle: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 24,
-              //height: -7,
-              color: Color.fromARGB(255, 65, 36, 114), 
-            ),
-            widget: Image.asset("academia_agenda.png"),
-            subtitle: Column(
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                      _navigateToHomePage(context);
-                  },
-                  child: const Text("Pular"),
-                ),
-              ],
-            )
-          ),
-        ],
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<AuthenticationBloc>(
+          create: (context) => AuthenticationBloc(userRepository),
+        ),
+        BlocProvider<RegistrationBloc>(
+          create: (context) => RegistrationBloc(userRepository),
+        ),
+        BlocProvider<ThemeBloc>(
+          create: (context) => ThemeBloc(),
+        ),
+        BlocProvider<UserBloc>( 
+          create: (context) => UserBloc(userRepository),
+        ),
+      ],
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+            title: 'Guido Power Academia',
+            debugShowCheckedModeBanner: false,
+            theme: state.themeData,
+            initialRoute: '/',
+            routes: {
+              '/': (context) => const LoginScreen(),
+              '/register': (context) => const RegistrationScreen(),
+              '/home': (context) => const HomeScreen(),
+            },
+          );
+        },
       ),
     );
   }
