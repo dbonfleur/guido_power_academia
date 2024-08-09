@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/authentication/authentication_bloc.dart';
+import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -60,7 +61,12 @@ class _LoginScreenState extends State<LoginScreen> {
             BlocConsumer<AuthenticationBloc, AuthenticationState>(
               listener: (context, state) {
                 if (state is AuthenticationSuccess) {
-                  Navigator.pushReplacementNamed(context, '/home');
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HomeScreen(), 
+                    ),
+                  );
                 } else if (state is AuthenticationFailure) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(state.error)),
@@ -76,15 +82,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     final username = _usernameController.text;
                     final password = _passwordController.text;
                     BlocProvider.of<AuthenticationBloc>(context).add(
-                      LoginRequested(username, password, rememberMe: _rememberMe),
+                      LoginRequested(username, password, _rememberMe, context), // Passando o context aqui
                     );
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    backgroundColor: Colors.purple,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary, 
+                    backgroundColor: Theme.of(context).colorScheme.primary, 
                   ),
                   child: const Text('Login'),
                 );

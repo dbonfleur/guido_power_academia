@@ -322,9 +322,10 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                      backgroundColor: Colors.purple, 
-                      foregroundColor: Colors.white, 
+                      borderRadius: BorderRadius.circular(15)
+                    ),
+                    foregroundColor: Theme.of(context).colorScheme.onPrimary, 
+                    backgroundColor: Theme.of(context).colorScheme.primary, 
                   ),
                   child: const Text('Registrar'),
                 );

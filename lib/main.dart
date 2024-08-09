@@ -14,6 +14,7 @@ import 'screens/registration_screen.dart';
 import 'screens/home_screen.dart';
 
 void main() {
+  
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
@@ -55,7 +56,7 @@ class MyApp extends StatelessWidget {
             routes: {
               '/': (context) => const LoginScreen(),
               '/register': (context) => const RegistrationScreen(),
-              '/home': (context) => const HomeScreen(),
+              '/home': (context) => HomeScreen(),
             },
           );
         },

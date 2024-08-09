@@ -1,9 +1,11 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../repositories/user_repository.dart';
 import '../../models/user_model.dart';
+import '../user/user_bloc.dart';
 
 part 'authentication_event.dart';
 part 'authentication_state.dart';
@@ -31,6 +33,8 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
           await prefs.setString('username', user.username);
         }
         emit(AuthenticationSuccess(user));
+
+        BlocProvider.of<UserBloc>(event.context).add(LoadUser(user.id!));
       } else {
         emit(const AuthenticationFailure('Usuário ou senha inválidos'));
       }
