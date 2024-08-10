@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'blocs/authentication/authentication_bloc.dart';
 import 'blocs/registration/registration_bloc.dart';
 import 'blocs/theme/theme_bloc.dart';
@@ -12,22 +13,29 @@ import 'services/database_helper.dart';
 import 'screens/login_screen.dart';
 import 'screens/registration_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/intro_screen.dart';
 
-void main() {
-  
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }
 
   final userRepository = UserRepository(DatabaseHelper.instance);
-  runApp(MyApp(userRepository: userRepository));
+
+  final prefs = await SharedPreferences.getInstance();
+  final bool introSeen = prefs.getBool('introSeen') ?? false;
+
+  runApp(MyApp(userRepository: userRepository, introSeen: introSeen));
 }
 
 class MyApp extends StatelessWidget {
   final UserRepository userRepository;
+  final bool introSeen;
 
-  const MyApp({super.key, required this.userRepository});
+  const MyApp({super.key, required this.userRepository, required this.introSeen});
 
   @override
   Widget build(BuildContext context) {
@@ -52,11 +60,13 @@ class MyApp extends StatelessWidget {
             title: 'Guido Power Academia',
             debugShowCheckedModeBanner: false,
             theme: state.themeData,
-            initialRoute: '/',
+            initialRoute: introSeen ? '/' : '/intro',
+            // initialRoute: '/intro',
             routes: {
               '/': (context) => const LoginScreen(),
               '/register': (context) => const RegistrationScreen(),
               '/home': (context) => HomeScreen(),
+              '/intro': (context) => const IntroScreen(),
             },
           );
         },
