@@ -13,60 +13,53 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeBloc, ThemeState>(
       builder: (context, themeState) {
-        return AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: themeState.themeData.primaryColor,
-          title: Row(
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Scaffold.of(context).openDrawer();
-                },
-                child: BlocBuilder<UserBloc, UserState>(
-                  builder: (context, state) {
-                    if (state is UserLoaded) {
-                      return CircleAvatar(
-                        backgroundColor: Colors.white,
-                        backgroundImage: state.user.imageUrl != null
-                            ? MemoryImage(base64Decode(state.user.imageUrl!))
-                            : null,
-                        child: state.user.imageUrl == null
-                            ? const Icon(Icons.person, color: Colors.purple)
-                            : null,
-                      );
-                    } else if (state is UserLoading) {
-                      return const CircularProgressIndicator();
-                    } else {
-                      return const CircleAvatar(
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.person, color: Colors.purple),
-                      );
-                    }
+        return BlocBuilder<UserBloc, UserState>(
+          builder: (context, userState) {
+            return AppBar(
+              automaticallyImplyLeading: false,
+              backgroundColor: themeState.themeData.primaryColor,
+              title: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Scaffold.of(context).openDrawer();
+                    },
+                    child: userState is UserLoaded
+                        ? CircleAvatar(
+                            backgroundColor: Colors.white,
+                            backgroundImage: userState.user.imageUrl != null
+                                ? MemoryImage(base64Decode(userState.user.imageUrl!))
+                                : null,
+                            child: userState.user.imageUrl == null
+                                ? const Icon(Icons.person, color: Colors.purple)
+                                : null,
+                          )
+                        : const CircularProgressIndicator(),
+                  ),
+                ],
+              ),
+              actions: [
+                IconButton(
+                  icon: Icon(
+                    Icons.notifications,
+                    color: themeState.themeData.iconTheme.color,
+                  ),
+                  onPressed: () {
+                    // Implementar ação de notificações
                   },
                 ),
-              ),
-            ],
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                Icons.notifications,
-                color: themeState.themeData.iconTheme.color,
-              ),
-              onPressed: () {
-                // Implementar ação de notificações
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                themeState.isLightTheme ? Icons.brightness_3 : Icons.wb_sunny,
-                color: themeState.themeData.iconTheme.color,
-              ),
-              onPressed: () {
-                BlocProvider.of<ThemeBloc>(context).add(ToggleThemeEvent());
-              },
-            ),
-          ],
+                IconButton(
+                  icon: Icon(
+                    themeState.isLightTheme ? Icons.brightness_3 : Icons.wb_sunny,
+                    color: themeState.themeData.iconTheme.color,
+                  ),
+                  onPressed: () {
+                    BlocProvider.of<ThemeBloc>(context).add(ToggleThemeEvent());
+                  },
+                ),
+              ],
+            );
+          },
         );
       },
     );

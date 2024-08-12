@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -19,6 +20,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    await DesktopWindow.setMinWindowSize(const Size(600, 900));
+    await DesktopWindow.setMaxWindowSize(const Size(600, 900));
+    await DesktopWindow.setWindowSize(const Size(600, 900));
+    
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
   }
@@ -60,8 +65,8 @@ class MyApp extends StatelessWidget {
             title: 'Guido Power Academia',
             debugShowCheckedModeBanner: false,
             theme: state.themeData,
-            initialRoute: introSeen ? '/' : '/intro',
-            // initialRoute: '/intro',
+            // initialRoute: introSeen ? '/' : '/intro',
+            initialRoute: '/intro',
             routes: {
               '/': (context) => const LoginScreen(),
               '/register': (context) => const RegistrationScreen(),

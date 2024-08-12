@@ -15,3 +15,49 @@ class LoadUser extends UserEvent {
   @override
   List<Object?> get props => [userId];
 }
+
+class UpdateUserName extends UserEvent {
+  final String fullName;
+
+  const UpdateUserName(this.fullName);
+
+  @override
+  List<Object?> get props => [fullName];
+}
+
+class UpdateUserDateOfBirth extends UserEvent {
+  final String dateOfBirth;
+
+  const UpdateUserDateOfBirth(this.dateOfBirth);
+
+  @override
+  List<Object?> get props => [dateOfBirth];
+}
+
+class UpdateUserPaymentMethod extends UserEvent {
+  final String paymentMethod;
+
+  const UpdateUserPaymentMethod(this.paymentMethod);
+
+  @override
+  List<Object?> get props => [paymentMethod];
+}
+
+class UpdateUserImage extends UserEvent {
+  final String? imageUrl;
+
+  const UpdateUserImage(this.imageUrl);
+
+  @override
+  List<Object?> get props => [imageUrl];
+}
+
+class UpdateUserPassword extends UserEvent {
+  final String oldPassword;
+  final String newPassword;
+
+  const UpdateUserPassword(this.oldPassword, this.newPassword);
+
+  @override
+  List<Object?> get props => [oldPassword, newPassword];
+}

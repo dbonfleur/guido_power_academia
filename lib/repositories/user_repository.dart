@@ -10,6 +10,10 @@ class UserRepository {
     await databaseHelper.createUser(user);
   }
 
+  Future<void> updateUser(User user) async {
+    await databaseHelper.updateUser(user);
+  }
+
   Future<User?> authenticate(String username, String password) async {
     return await databaseHelper.getUser(username, password);
   }

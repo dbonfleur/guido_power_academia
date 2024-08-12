@@ -49,6 +49,16 @@ class DatabaseHelper {
     return id;
   }
 
+  Future<int> updateUser(User user) async {
+    final db = await instance.database;
+    return db.update(
+      'user',
+      user.toMap(),
+      where: 'id = ?',
+      whereArgs: [user.id],
+    );
+  }
+
   Future<User?> getUser(String username, String password) async {
     final db = await instance.database;
     final hashedPassword = User.hashPassword(password);

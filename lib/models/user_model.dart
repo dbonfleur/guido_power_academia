@@ -27,6 +27,12 @@ class User {
     this.imageUrl,
   });
 
+  static String hashPassword(String password) {
+    var bytes = utf8.encode(password);
+    var digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -42,9 +48,85 @@ class User {
     };
   }
 
-  static String hashPassword(String password) {
-    var bytes = utf8.encode(password);
-    var digest = sha256.convert(bytes);
-    return digest.toString();
+  User copyWithPassword({
+    required String password,
+  }) {
+    return User(
+      id: id,
+      username: username,
+      fullName: fullName,
+      dateOfBirth: dateOfBirth,
+      email: email,
+      password: password,
+      paymentMethod: paymentMethod,
+      contractDuration: contractDuration,
+      accountType: accountType,
+      imageUrl: imageUrl,
+    );
+  }
+
+  copyWithUserImage({
+    String? imageUrl
+  }) {
+    return User(
+      id: id,
+      username: username,
+      fullName: fullName,
+      dateOfBirth: dateOfBirth,
+      email: email,
+      password: password,
+      paymentMethod: paymentMethod,
+      contractDuration: contractDuration,
+      accountType: accountType,
+      imageUrl: imageUrl,
+    );
+  }
+
+  copyWithPaymentMethod({required String paymentMethod}) {
+    return User(
+      id: id,
+      username: username,
+      fullName: fullName,
+      dateOfBirth: dateOfBirth,
+      email: email,
+      password: password,
+      paymentMethod: paymentMethod,
+      contractDuration: contractDuration,
+      accountType: accountType,
+      imageUrl: imageUrl,
+    );
+  }
+
+  copyWithDateOfBirth({required String dateOfBirth}) {
+    return User(
+      id: id,
+      username: username,
+      fullName: fullName,
+      dateOfBirth: dateOfBirth,
+      email: email,
+      password: password,
+      paymentMethod: paymentMethod,
+      contractDuration: contractDuration,
+      accountType: accountType,
+      imageUrl: imageUrl,
+    );
+  }
+
+  copyWithUserName({required String fullName}) {
+    return User(
+      id: id,
+      username: username,
+      fullName: fullName,
+      dateOfBirth: dateOfBirth,
+      email: email,
+      password: password,
+      paymentMethod: paymentMethod,
+      contractDuration: contractDuration,
+      accountType: accountType,
+      imageUrl: imageUrl,
+    );
   }
 }
+
+
+
