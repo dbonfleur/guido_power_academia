@@ -17,7 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           builder: (context, userState) {
             return AppBar(
               automaticallyImplyLeading: false,
-              backgroundColor: themeState.themeData.primaryColor,
+              backgroundColor: themeState.themeData.appBarTheme.backgroundColor,
               title: Row(
                 children: [
                   GestureDetector(
@@ -31,7 +31,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                                 ? MemoryImage(base64Decode(userState.user.imageUrl!))
                                 : null,
                             child: userState.user.imageUrl == null
-                                ? const Icon(Icons.person, color: Colors.purple)
+                                ? Icon(Icons.person, color: themeState.themeData.appBarTheme.backgroundColor)
                                 : null,
                           )
                         : const CircularProgressIndicator(),

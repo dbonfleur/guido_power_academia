@@ -25,7 +25,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
   ) async {
     emit(AuthenticationLoading());
     try {
-      final user = await userRepository.authenticate(event.username, event.password);
+      final user = await userRepository.getAuth(event.username, event.password);
       if (user != null) {
         if (event.rememberMe) {
           final prefs = await SharedPreferences.getInstance();

@@ -36,15 +36,26 @@ class _IntroScreenState extends State<IntroScreen> {
   void initState() {
     super.initState();
     _controller.addListener(() {
-      setState(() {
-        _currentIndex = _controller.page?.round() ?? 0;
-      });
+      if (mounted) {
+        setState(() {
+          _currentIndex = _controller.page?.round() ?? 0;
+        });
+      }
     });
   }
 
   Future<void> _setIntroSeen() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('introSeen', true);
+  }
+
+  void _navigate(BuildContext context, String routeName) {
+    Navigator.pushReplacementNamed(context, routeName);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -56,6 +67,35 @@ class _IntroScreenState extends State<IntroScreen> {
             child: FlutterCarouselIntro(
               slides: _slides,
               controller: _controller,
+              showIndicators: false,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(
+              _slides.length,
+              (index) => GestureDetector(
+                onTap: () {
+                  if (mounted && _controller.positions.isNotEmpty) {
+                    _controller.animateToPage(
+                      index,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.ease,
+                    );
+                  }
+                },
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                  width: 14.0,
+                  height: 14.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Theme.of(context).colorScheme.primary.withOpacity(
+                      _currentIndex == index ? 0.9 : 0.4,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
           Padding(
@@ -63,43 +103,53 @@ class _IntroScreenState extends State<IntroScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                if (_currentIndex == 0)
+                  TextButton(
+                    onPressed: () {
+                      _setIntroSeen();
+                      _navigate(context, '/');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Theme.of(context).buttonTheme.colorScheme?.onPrimary, 
+                      backgroundColor: Theme.of(context).buttonTheme.colorScheme?.primary, 
+                    ),
+                    child: const Text('Pular'),
+                  ),
                 if (_currentIndex > 0)
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      _controller.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.ease,
-                      );
+                      if (mounted && _controller.positions.isNotEmpty) {
+                        _controller.previousPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
+                      }
                     },
                   ),
                 if (_currentIndex == _slides.length - 1)
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _setIntroSeen();
-                          Navigator.pushReplacementNamed(context, '/');
-                        },
-                        child: const Text('Concluir'),
-                      ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _setIntroSeen();
+                      _navigate(context, '/');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Theme.of(context).colorScheme.onPrimary, 
+                      backgroundColor: Theme.of(context).colorScheme.primary, 
                     ),
+                    child: const Text('Concluir'),
                   )
                 else
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: IconButton(
-                        icon: const Icon(Icons.arrow_forward),
-                        onPressed: () {
-                          _controller.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.ease,
-                          );
-                        },
-                      ),
-                    ),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_forward),
+                    onPressed: () {
+                      if (mounted && _controller.positions.isNotEmpty) {
+                        _controller.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
+                      }
+                    },
                   ),
               ],
             ),

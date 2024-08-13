@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guido_power_academia/screens/finance_screen.dart';
-import 'package:guido_power_academia/screens/contract_screen.dart';
-import 'package:guido_power_academia/screens/settings_screen.dart';
-import 'package:guido_power_academia/screens/workout_screen.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/drawer_menu.dart';
 import '../blocs/page/page_bloc.dart';
 import '../blocs/page/page_event.dart';
 import '../blocs/page/page_state.dart';
+import 'contract_screen.dart';
+import 'finance_screen.dart';
+import 'initial_screen.dart';
+import 'settings_screen.dart';
+import 'workout_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   final List<Widget> _pages = [
-    const InitialScreen(), 
+    const InitialScreen(),
     const WorkoutScreen(),
     const FinanceScreen(),
     const ContractScreen(),
@@ -48,16 +49,5 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class InitialScreen extends StatelessWidget {
-  const InitialScreen({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Welcome to Guido Power Academia'));
   }
 }

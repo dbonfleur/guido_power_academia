@@ -70,6 +70,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        foregroundColor: Theme.of(context).colorScheme.onPrimary,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -81,6 +83,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   CircleAvatar(
                     radius: 50,
                     backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
+                    backgroundColor: _imageFile == null ? Theme.of(context).colorScheme.primary : null,
                     child: _imageFile == null
                         ? const Icon(Icons.person, size: 50, color: Colors.white)
                         : null,
@@ -243,7 +246,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               },
               iconEnabledColor: Colors.purple,
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 14),
             Row(
               children: [
                 Expanded(

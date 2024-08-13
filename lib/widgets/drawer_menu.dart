@@ -38,7 +38,7 @@ class DrawerMenu extends StatelessWidget {
                                   ? MemoryImage(base64Decode(state.user.imageUrl!))
                                   : null,
                               child: state.user.imageUrl == null
-                                  ? const Icon(Icons.person, color: Colors.purple)
+                                  ? Icon(Icons.person, color: themeState.themeData.appBarTheme.backgroundColor)
                                   : null,
                             ),
                             decoration: BoxDecoration(
@@ -157,7 +157,7 @@ class DrawerMenu extends StatelessWidget {
       tileColor: isSelected
           ? (themeState.themeData.brightness == Brightness.dark
               ? Colors.white
-              : Colors.purple)
+              : themeState.themeData.appBarTheme.backgroundColor)
           : null,
       shape: isSelected
           ? const RoundedRectangleBorder(

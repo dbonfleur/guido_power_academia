@@ -1,6 +1,5 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
-import '../models/user_model.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -21,8 +20,9 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _createDB,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -40,137 +40,33 @@ class DatabaseHelper {
       imageUrl TEXT
     )''';
 
+    const messagesTable = '''CREATE TABLE messages (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      content TEXT NOT NULL,
+      imageUrl TEXT,
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL,
+      userId INTEGER NOT NULL,
+      FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
+    )''';
+
     await db.execute(userTable);
+    await db.execute(messagesTable);
   }
 
-  Future<int> createUser(User user) async {
-    final db = await instance.database;
-    final id = await db.insert('user', user.toMap());
-    return id;
-  }
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      const messagesTable = '''CREATE TABLE messages (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        content TEXT NOT NULL,
+        imageUrl TEXT,
+        createdAt TEXT NOT NULL,
+        updatedAt TEXT NOT NULL,
+        userId INTEGER NOT NULL,
+        FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
+      )''';
 
-  Future<int> updateUser(User user) async {
-    final db = await instance.database;
-    return db.update(
-      'user',
-      user.toMap(),
-      where: 'id = ?',
-      whereArgs: [user.id],
-    );
-  }
-
-  Future<User?> getUser(String username, String password) async {
-    final db = await instance.database;
-    final hashedPassword = User.hashPassword(password);
-    final maps = await db.query(
-      'user',
-      columns: [
-        'id',
-        'username',
-        'fullName',
-        'dateOfBirth',
-        'email',
-        'password',
-        'paymentMethod',
-        'contractDuration',
-        'accountType',
-        'imageUrl'
-      ],
-      where: 'username = ? AND password = ?',
-      whereArgs: [username, hashedPassword],
-    );
-
-    if (maps.isNotEmpty) {
-      return User(
-        id: maps.first['id'] as int?,
-        username: maps.first['username'] as String,
-        fullName: maps.first['fullName'] as String,
-        dateOfBirth: maps.first['dateOfBirth'] as String,
-        email: maps.first['email'] as String,
-        password: maps.first['password'] as String,
-        paymentMethod: maps.first['paymentMethod'] as String,
-        contractDuration: maps.first['contractDuration'] as int,
-        accountType: maps.first['accountType'] as String,
-        imageUrl: maps.first['imageUrl'] as String?,
-      );
-    } else {
-      return null;
-    }
-  }
-
-  Future<User?> getUserByUsername(String username) async {
-    final db = await instance.database;
-    final maps = await db.query(
-      'user',
-      columns: [
-        'id',
-        'username',
-        'fullName',
-        'dateOfBirth',
-        'email',
-        'password',
-        'paymentMethod',
-        'contractDuration',
-        'accountType',
-        'imageUrl'
-      ],
-      where: 'username = ?',
-      whereArgs: [username],
-    );
-
-    if (maps.isNotEmpty) {
-      return User(
-        id: maps.first['id'] as int?,
-        username: maps.first['username'] as String,
-        fullName: maps.first['fullName'] as String,
-        dateOfBirth: maps.first['dateOfBirth'] as String,
-        email: maps.first['email'] as String,
-        password: maps.first['password'] as String,
-        paymentMethod: maps.first['paymentMethod'] as String,
-        contractDuration: maps.first['contractDuration'] as int,
-        accountType: maps.first['accountType'] as String,
-        imageUrl: maps.first['imageUrl'] as String?,
-      );
-    } else {
-      return null;
-    }
-  }
-
-  Future<User?> getUserById(int id) async {
-    final db = await instance.database;
-    final maps = await db.query(
-      'user',
-      columns: [
-        'id',
-        'username',
-        'fullName',
-        'dateOfBirth',
-        'email',
-        'password',
-        'paymentMethod',
-        'contractDuration',
-        'accountType',
-        'imageUrl'
-      ],
-      where: 'id = ?',
-      whereArgs: [id],
-    );
-
-    if (maps.isNotEmpty) {
-      return User(
-        id: maps.first['id'] as int?,
-        username: maps.first['username'] as String,
-        fullName: maps.first['fullName'] as String,
-        dateOfBirth: maps.first['dateOfBirth'] as String,
-        email: maps.first['email'] as String,
-        password: maps.first['password'] as String,
-        paymentMethod: maps.first['paymentMethod'] as String,
-        contractDuration: maps.first['contractDuration'] as int,
-        accountType: maps.first['accountType'] as String,
-        imageUrl: maps.first['imageUrl'] as String?,
-      );
-    } else {
-      return null;
+      await db.execute(messagesTable);
     }
   }
 }

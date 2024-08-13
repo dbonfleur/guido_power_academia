@@ -7,10 +7,11 @@ class ThemeState {
   ThemeState._(this.themeData, this.isLightTheme);
 
   factory ThemeState.light() {
+    const colorPurple = Color.fromARGB(255, 183, 34, 221);
     return ThemeState._(ThemeData.light().copyWith(
-      primaryColor: Colors.purple,
+      primaryColor: colorPurple,
       appBarTheme: const AppBarTheme(
-        color: Colors.purple,
+        color: colorPurple,
       ),
     ), true);
   }
