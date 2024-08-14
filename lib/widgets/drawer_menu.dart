@@ -27,37 +27,91 @@ class DrawerMenu extends StatelessWidget {
                 BlocBuilder<UserBloc, UserState>(
                   builder: (context, state) {
                     if (state is UserLoaded) {
-                      return Stack(
+                      return Column(
                         children: [
-                          UserAccountsDrawerHeader(
-                            accountName: Text(state.user.fullName),
-                            accountEmail: Text(state.user.email),
-                            currentAccountPicture: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              backgroundImage: state.user.imageUrl != null
-                                  ? MemoryImage(base64Decode(state.user.imageUrl!))
-                                  : null,
-                              child: state.user.imageUrl == null
-                                  ? Icon(Icons.person, color: themeState.themeData.appBarTheme.backgroundColor)
-                                  : null,
-                            ),
-                            decoration: BoxDecoration(
-                              color: themeState.themeData.primaryColor,
-                            ),
-                          ),
-                          Positioned(
-                            top: 8,
-                            right: 8,
-                            child: IconButton(
-                              icon: Icon(
-                                Icons.settings,
-                                color: themeState.themeData.iconTheme.color,
+                          Stack(
+                            children: [
+                              UserAccountsDrawerHeader(
+                                accountName: Text(state.user.fullName),
+                                accountEmail: Text(state.user.email),
+                                currentAccountPicture: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  backgroundImage: state.user.imageUrl != null
+                                      ? MemoryImage(base64Decode(state.user.imageUrl!))
+                                      : null,
+                                  child: state.user.imageUrl == null
+                                      ? Icon(Icons.person, color: themeState.themeData.appBarTheme.backgroundColor)
+                                      : null,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: themeState.themeData.primaryColor,
+                                ),
                               ),
-                              onPressed: () {
-                                onItemTapped(4);
-                              },
-                            ),
+                              Positioned(
+                                top: 8,
+                                right: 8,
+                                child: IconButton(
+                                  icon: Icon(
+                                    Icons.settings,
+                                    color: themeState.themeData.iconTheme.color,
+                                  ),
+                                  onPressed: () {
+                                    onItemTapped(4);
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
+                          _buildMenuItem(
+                            context,
+                            themeState,
+                            icon: Icons.home,
+                            text: 'Início',
+                            index: 0,
+                            selectedIndex: selectedIndex,
+                          ),
+                          _buildMenuItem(
+                            context,
+                            themeState,
+                            icon: Icons.fitness_center,
+                            text: 'Treinos',
+                            index: 1,
+                            selectedIndex: selectedIndex,
+                          ),
+                          _buildMenuItem(
+                            context,
+                            themeState,
+                            icon: Icons.attach_money,
+                            text: 'Financeiro',
+                            index: 2,
+                            selectedIndex: selectedIndex,
+                          ),
+                          _buildMenuItem(
+                            context,
+                            themeState,
+                            icon: Icons.assignment,
+                            text: 'Contrato',
+                            index: 3,
+                            selectedIndex: selectedIndex,
+                          ),
+                          if (state.user.accountType == 'admin') 
+                            _buildMenuItem(
+                              context,
+                              themeState,
+                              icon: Icons.group,
+                              text: 'Treinadores',
+                              index: 5,
+                              selectedIndex: selectedIndex,
+                            ),
+                          if (state.user.accountType == 'admin' || state.user.accountType == 'treinador')
+                            _buildMenuItem(
+                              context,
+                              themeState,
+                              icon: Icons.person,
+                              text: 'Alunos',
+                              index: 6,
+                              selectedIndex: selectedIndex,
+                            ),
                         ],
                       );
                     } else if (state is UserLoading) {
@@ -76,38 +130,6 @@ class DrawerMenu extends StatelessWidget {
                       );
                     }
                   },
-                ),
-                _buildMenuItem(
-                  context,
-                  themeState,
-                  icon: Icons.home,
-                  text: 'Início',
-                  index: 0,
-                  selectedIndex: selectedIndex,
-                ),
-                _buildMenuItem(
-                  context,
-                  themeState,
-                  icon: Icons.fitness_center,
-                  text: 'Treinos',
-                  index: 1,
-                  selectedIndex: selectedIndex,
-                ),
-                _buildMenuItem(
-                  context,
-                  themeState,
-                  icon: Icons.attach_money,
-                  text: 'Financeiro',
-                  index: 2,
-                  selectedIndex: selectedIndex,
-                ),
-                _buildMenuItem(
-                  context,
-                  themeState,
-                  icon: Icons.assignment,
-                  text: 'Contrato',
-                  index: 3,
-                  selectedIndex: selectedIndex,
                 ),
                 const Spacer(),
                 ListTile(

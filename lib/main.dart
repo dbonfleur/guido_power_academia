@@ -2,6 +2,12 @@ import 'dart:io';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guido_power_academia/blocs/treino/historico_treino_bloc.dart';
+import 'package:guido_power_academia/blocs/treino/pacote_treino_bloc.dart';
+import 'package:guido_power_academia/blocs/treino/pesos_treino_bloc.dart';
+import 'package:guido_power_academia/blocs/treino/treino_bloc.dart';
+import 'package:guido_power_academia/blocs/treino/user_pacote_treino_bloc.dart';
+import 'package:guido_power_academia/repositories/treino_repository.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'blocs/authentication/authentication_bloc.dart';
@@ -33,6 +39,7 @@ void main() async {
 
   final userRepository = UserRepository(DatabaseHelper.instance);
   final muralRepository = MuralRepository(databaseHelper: DatabaseHelper.instance);
+  final treinoRepository = TreinoRepository(DatabaseHelper.instance);
 
   final prefs = await SharedPreferences.getInstance();
   final bool introSeen = prefs.getBool('introSeen') ?? false;
@@ -40,6 +47,7 @@ void main() async {
   runApp(MyApp(
     userRepository: userRepository,
     muralRepository: muralRepository,
+    treinoRepository: treinoRepository,
     introSeen: introSeen,
   ));
 }
@@ -47,12 +55,14 @@ void main() async {
 class MyApp extends StatelessWidget {
   final UserRepository userRepository;
   final MuralRepository muralRepository;
+  final TreinoRepository treinoRepository;
   final bool introSeen;
 
   const MyApp({
     super.key,
     required this.userRepository,
     required this.muralRepository,
+    required this.treinoRepository,
     required this.introSeen,
   });
 
@@ -74,6 +84,21 @@ class MyApp extends StatelessWidget {
         ),
         BlocProvider<MuralBloc>(
           create: (context) => MuralBloc(muralRepo: muralRepository)..add(LoadMurals()),
+        ),
+        BlocProvider(
+          create: (context) => TreinoBloc(treinoRepository),
+        ),
+        BlocProvider(
+          create: (context) => UserPacoteTreinoBloc(treinoRepository)
+        ),
+        BlocProvider(
+          create: (context) => PesosTreinoBloc(treinoRepository)
+        ),
+        BlocProvider(
+          create: (context) => PacoteTreinoBloc(treinoRepository)
+        ),
+        BlocProvider(
+          create: (context) => HistoricoTreinoBloc(treinoRepository),
         ),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guido_power_academia/screens/student_screen.dart';
+import 'package:guido_power_academia/screens/trainer_screen.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/drawer_menu.dart';
 import '../blocs/page/page_bloc.dart';
@@ -20,6 +22,8 @@ class HomeScreen extends StatelessWidget {
     const FinanceScreen(),
     const ContractScreen(),
     const SettingsScreen(),
+    const TrainerScreen(),
+    const StudentScreen(),
   ];
 
   @override

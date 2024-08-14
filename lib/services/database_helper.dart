@@ -49,7 +49,61 @@ class DatabaseHelper {
       FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
     )''';
 
+    const treinoTable = '''CREATE TABLE treino (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL,
+      nome TEXT NOT NULL,
+      qtdSeries INTEGER NOT NULL,
+      qtdRepeticoes TEXT NOT NULL
+    )''';
+
+    const pacoteTreinoTable = '''CREATE TABLE pacote_treino (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL,
+      nomePacote TEXT NOT NULL,
+      letraDivisao TEXT NOT NULL,
+      tipoTreino TEXT NOT NULL
+    )''';
+
+    const userPacoteTreinoTable = '''CREATE TABLE user_pacote_treino (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      createdAt TEXT NOT NULL,
+      updatedAt TEXT NOT NULL,
+      valido INTEGER NOT NULL,
+      pacoteTreinoId INTEGER NOT NULL,
+      userTreinadorId INTEGER NOT NULL,
+      userAlunoId INTEGER NOT NULL,
+      FOREIGN KEY (pacoteTreinoId) REFERENCES pacote_treino(id),
+      FOREIGN KEY (userTreinadorId) REFERENCES user(id),
+      FOREIGN KEY (userAlunoId) REFERENCES user(id)
+    )''';
+
+    const pesosTreinoTable = '''CREATE TABLE pesos_treino (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      createdAt TEXT NOT NULL,
+      treinoId INTEGER NOT NULL,
+      peso INTEGER,
+      userId INTEGER NOT NULL,
+      FOREIGN KEY (treinoId) REFERENCES treino(id),
+      FOREIGN KEY (userId) REFERENCES user(id)
+    )''';
+
+    const historicoTreinoTable = '''CREATE TABLE historico_treino (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      createdAt TEXT NOT NULL,
+      tempoTreino TEXT NOT NULL,
+      userPacoteTreinoId INTEGER NOT NULL,
+      FOREIGN KEY (userPacoteTreinoId) REFERENCES user_pacote_treino(id)
+    )''';
+
     await db.execute(userTable);
     await db.execute(muralsTable);
+    await db.execute(treinoTable);
+    await db.execute(pacoteTreinoTable);
+    await db.execute(userPacoteTreinoTable);
+    await db.execute(pesosTreinoTable);
+    await db.execute(historicoTreinoTable);
   }
 }
