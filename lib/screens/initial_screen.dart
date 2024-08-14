@@ -55,9 +55,11 @@ class InitialScreen extends StatelessWidget {
                           ),
                         ),
                         if (message.imageUrl != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Image.memory(base64Decode(message.imageUrl!)),
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                              child: Image.memory(base64Decode(message.imageUrl!)),
+                            ),
                           ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
@@ -93,12 +95,16 @@ class InitialScreen extends StatelessWidget {
             return FloatingActionButton(
               onPressed: () => _showAddMessageDialog(context),
               backgroundColor: state.themeData.appBarTheme.backgroundColor,
-              child: const Icon(Icons.add),
+              child: Icon(
+                Icons.add,
+                color: state.themeData.iconTheme.color,
+              ),
             );
           },
         );
       }
     }
+    
     return Container();
   }
 
@@ -108,24 +114,36 @@ class InitialScreen extends StatelessWidget {
     if (userState is UserLoaded) {
       final user = userState.user;
       if (user.accountType == 'treinador' && user.id == message.userId) {
-        return IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: () => _showEditMessageDialog(context, message),
+        return BlocBuilder<ThemeBloc, ThemeState>(
+          builder: (BuildContext context, ThemeState state) {
+            return IconButton(
+              icon: Icon(
+                Icons.edit,
+                color: state.themeData.iconTheme.color,
+              ),
+              onPressed: () => _showEditMessageDialog(context, message),
+            );
+          }
         );
       } else if (user.accountType == 'admin') {
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          
-          children: [
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () => _showEditMessageDialog(context, message),
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () => _confirmDeleteMessage(context, message.id!),
-            ),
-          ],
+        return BlocBuilder<ThemeBloc, ThemeState>(
+          builder: (BuildContext context, ThemeState state) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  color: state.themeData.primaryIconTheme.color,
+                  onPressed: () => _showEditMessageDialog(context, message),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete),
+                  color: state.themeData.primaryIconTheme.color,
+                  onPressed: () => _confirmDeleteMessage(context, message.id!),
+                ),
+              ],
+            );
+          },
         );
       }
     }
@@ -140,101 +158,114 @@ class InitialScreen extends StatelessWidget {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Adicionar Mensagem'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              quill.QuillToolbar.simple(
-                controller: quillController,
-                configurations: const quill.QuillSimpleToolbarConfigurations(
-                  showBoldButton: true,
-                  showItalicButton: true,
-                  showUnderLineButton: true,
-                  showListBullets: true,
-                  showListNumbers: true,
-                  showListCheck: true,
-                  showFontFamily: false,
-                  showFontSize: false,
-                  showStrikeThrough: false,
-                  showInlineCode: false,
-                  showColorButton: false,
-                  showBackgroundColorButton: false,
-                  showClearFormat: false,
-                  showAlignmentButtons: false,
-                  showHeaderStyle: false,
-                  showCodeBlock: false,
-                  showQuote: false,
-                  showIndent: false,
-                  showLink: false,
-                  showUndo: false,
-                  showRedo: false,
-                  showSearchButton: false,
-                  showSubscript: false,
-                  showSuperscript: false,
-                ),
-              ),
-              const SizedBox(height: 10),
-              SizedBox(
-                height: 200,
-                child: quill.QuillEditor(
-                  controller: quillController,
-                  scrollController: ScrollController(),
-                  focusNode: FocusNode(),
-                  configurations: quill.QuillEditorConfigurations(
-                    autoFocus: true,
-                    scrollable: true,
-                    padding: EdgeInsets.zero,
-                    expands: false,
-                    embedBuilders: [CustomEmbedBuilder()],
+        return BlocBuilder<ThemeBloc, ThemeState>(
+          builder: (context, stateTheme) {
+            return AlertDialog(
+              title: const Text('Adicionar Mensagem'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  quill.QuillToolbar.simple(
+                    controller: quillController,
+                    configurations: const quill.QuillSimpleToolbarConfigurations(
+                      showBoldButton: true,
+                      showItalicButton: true,
+                      showUnderLineButton: true,
+                      showListBullets: true,
+                      showListNumbers: true,
+                      showListCheck: true,
+                      showFontFamily: false,
+                      showFontSize: false,
+                      showStrikeThrough: false,
+                      showInlineCode: false,
+                      showColorButton: false,
+                      showBackgroundColorButton: false,
+                      showClearFormat: false,
+                      showAlignmentButtons: false,
+                      showHeaderStyle: false,
+                      showCodeBlock: false,
+                      showQuote: false,
+                      showIndent: false,
+                      showLink: false,
+                      showUndo: false,
+                      showRedo: false,
+                      showSearchButton: false,
+                      showSubscript: false,
+                      showSuperscript: false,
+                    ),
                   ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    height: 200,
+                    child: quill.QuillEditor(
+                      controller: quillController,
+                      scrollController: ScrollController(),
+                      focusNode: FocusNode(),
+                      configurations: quill.QuillEditorConfigurations(
+                        autoFocus: true,
+                        scrollable: true,
+                        padding: EdgeInsets.zero,
+                        expands: false,
+                        embedBuilders: [CustomEmbedBuilder()],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
+                      if (pickedFile != null) {
+                        selectedImage = pickedFile;
+                      }
+                    },
+                    style: stateTheme.themeData.elevatedButtonTheme.style,
+                    child: const Text('Selecionar Imagem'),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ButtonStyle(         
+                    backgroundColor: stateTheme.isLightTheme ? WidgetStateProperty.all(Colors.red) : null,
+                    foregroundColor: stateTheme.isLightTheme ? WidgetStateProperty.all(Colors.white) : null,
+                  ),
+                  child: const Text('Cancelar'),
                 ),
-              ),
-              const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  final pickedFile = await imagePicker.pickImage(source: ImageSource.gallery);
-                  if (pickedFile != null) {
-                    selectedImage = pickedFile;
-                  }
-                },
-                child: const Text('Selecionar Imagem'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                final userState = context.read<UserBloc>().state;
-                if (userState is UserLoaded) {
-                  final user = userState.user;
-                  final content = jsonEncode(quillController.document.toDelta().toJson());
-                  String? imageUrl;
-
-                  if (selectedImage != null) {
-                    imageUrl = base64Encode(File(selectedImage!.path).readAsBytesSync());
-                  }
-
-                  if (content.isNotEmpty) {
-                    final message = Message(
-                      content: content,
-                      imageUrl: imageUrl,
-                      createdAt: DateTime.now(),
-                      updatedAt: DateTime.now(),
-                      userId: user.id!,
-                    );
-                    context.read<MessageBloc>().add(AddMessage(message));
-                    Navigator.of(context).pop();
-                  }
-                }
-              },
-              child: const Text('Adicionar'),
-            ),
-          ],
+                ElevatedButton(
+                  onPressed: () {
+                    final userState = context.read<UserBloc>().state;
+                    if (userState is UserLoaded) {
+                      final user = userState.user;
+                      final content = jsonEncode(quillController.document.toDelta().toJson());
+                      String? imageUrl;
+            
+                      if (selectedImage != null) {
+                        imageUrl = base64Encode(File(selectedImage!.path).readAsBytesSync());
+                      }
+            
+                      if (content.isNotEmpty) {
+                        final message = Message(
+                          content: content,
+                          imageUrl: imageUrl,
+                          createdAt: DateTime.now(),
+                          updatedAt: DateTime.now(),
+                          userId: user.id!,
+                        );
+                        context.read<MessageBloc>().add(AddMessage(message));
+                        Navigator.of(context).pop();
+                      }
+                    }
+                  },
+                  style: ButtonStyle(         
+                    backgroundColor: stateTheme.isLightTheme ? WidgetStateProperty.all(Colors.green) : null,
+                    foregroundColor: stateTheme.isLightTheme ? WidgetStateProperty.all(Colors.white) : null,
+                  ),
+                  child: const Text('Adicionar'),
+                ),
+              ],
+            );
+          }
         );
       },
     );

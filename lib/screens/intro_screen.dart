@@ -126,6 +126,7 @@ class _IntroScreenState extends State<IntroScreen> {
                         );
                       }
                     },
+                    color: Theme.of(context).buttonTheme.colorScheme?.primary,
                   ),
                 if (_currentIndex == _slides.length - 1)
                   ElevatedButton(
@@ -150,6 +151,7 @@ class _IntroScreenState extends State<IntroScreen> {
                         );
                       }
                     },
+                    color: Theme.of(context).buttonTheme.colorScheme?.primary,
                   ),
               ],
             ),

@@ -13,6 +13,18 @@ class ThemeState {
       appBarTheme: const AppBarTheme(
         color: colorPurple,
       ),
+      iconTheme: const IconThemeData(
+        color: Color.fromARGB(255, 224, 224, 224),
+      ),
+      primaryIconTheme: const IconThemeData(
+        color: Colors.black,
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ButtonStyle(
+          backgroundColor: WidgetStateProperty.all(colorPurple),
+          foregroundColor: WidgetStateProperty.all(Colors.white),
+        ),
+      ), 
     ), true);
   }
 
@@ -21,7 +33,7 @@ class ThemeState {
       primaryColor: Colors.deepPurple,
       appBarTheme: const AppBarTheme(
         color: Colors.deepPurple,
-      ),
+      )
     ), false);
   }
 }

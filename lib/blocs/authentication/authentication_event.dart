@@ -19,8 +19,6 @@ class LoginRequested extends AuthenticationEvent {
   List<Object?> get props => [username, password, rememberMe, context];
 }
 
-
-
 class CheckLoginStatus extends AuthenticationEvent {}
 
 class LogoutRequested extends AuthenticationEvent {}

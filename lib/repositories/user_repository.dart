@@ -6,26 +6,6 @@ class UserRepository {
 
   UserRepository(this.databaseHelper);
 
-  // Future<void> createUser(User user) async {
-  //   await databaseHelper.createUser(user);
-  // }
-
-  // Future<void> updateUser(User user) async {
-  //   await databaseHelper.updateUser(user);
-  // }
-
-  // Future<User?> authenticate(String username, String password) async {
-  //   return await databaseHelper.getUser(username, password);
-  // }
-
-  // Future<User?> getUserByUsername(String username) async {
-  //   return await databaseHelper.getUserByUsername(username);
-  // }
-
-  // Future<User?> getUserById(int userId) async {
-  //   return await databaseHelper.getUserById(userId);  
-  // }
-
   Future<int> createUser(User user) async {
     final db = await databaseHelper.database;
     final id = await db.insert('user', user.toMap());

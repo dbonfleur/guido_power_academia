@@ -20,22 +20,66 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               backgroundColor: themeState.themeData.appBarTheme.backgroundColor,
               title: Row(
                 children: [
-                  GestureDetector(
-                    onTap: () {
-                      Scaffold.of(context).openDrawer();
-                    },
-                    child: userState is UserLoaded
-                        ? CircleAvatar(
-                            backgroundColor: Colors.white,
-                            backgroundImage: userState.user.imageUrl != null
-                                ? MemoryImage(base64Decode(userState.user.imageUrl!))
-                                : null,
-                            child: userState.user.imageUrl == null
-                                ? Icon(Icons.person, color: themeState.themeData.appBarTheme.backgroundColor)
-                                : null,
-                          )
-                        : const CircularProgressIndicator(),
+                  Stack(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Scaffold.of(context).openDrawer();
+                        },
+                        child: userState is UserLoaded
+                            ? CircleAvatar(
+                                backgroundColor: Colors.white,
+                                backgroundImage: userState.user.imageUrl != null
+                                    ? MemoryImage(base64Decode(userState.user.imageUrl!))
+                                    : null,
+                                child: userState.user.imageUrl == null
+                                    ? Icon(Icons.person, color: themeState.themeData.appBarTheme.backgroundColor)
+                                    : null,
+                              )
+                            : const CircularProgressIndicator(),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: themeState.themeData.appBarTheme.backgroundColor,
+                            shape: BoxShape.circle,
+                          ),
+                          padding: const EdgeInsets.all(2),
+                          child: Icon(
+                            Icons.menu,
+                            size: 12,
+                            color: themeState.themeData.iconTheme.color,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  const SizedBox(width: 8),
+                  if (userState is UserLoaded)
+                    Container(
+                      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 6),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: userState.user.accountType == 'admin'
+                              ? const Color.fromARGB(255, 17, 255, 0)
+                              : (userState.user.accountType == 'treinador' ? Colors.yellow: Colors.transparent),
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        userState.user.accountType == 'admin'
+                            ? 'Admin'
+                            : (userState.user.accountType == 'treinador' ? 'Treinador' : ''),
+                        style: TextStyle(
+                          color: userState.user.accountType == 'admin'
+                              ? const Color.fromARGB(255, 17, 255, 0)
+                              : (userState.user.accountType == 'treinador' ? Colors.yellow : Colors.transparent),
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
                 ],
               ),
               actions: [
@@ -45,7 +89,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     color: themeState.themeData.iconTheme.color,
                   ),
                   onPressed: () {
-                    // Implementar ação de notificações
+                    // Implementar notificações
                   },
                 ),
                 IconButton(

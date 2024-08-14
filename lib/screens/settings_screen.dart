@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guido_power_academia/blocs/theme/theme_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import '../blocs/theme/theme_state.dart';
 import '../blocs/user/user_bloc.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -53,113 +55,138 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<UserBloc, UserState>(
-      builder: (context, state) {
-        if (state is UserLoaded) {
-          _nameController.text = state.user.fullName;
-          _dateOfBirthController.text = state.user.dateOfBirth;
-          _selectedPaymentMethod = state.user.paymentMethod;
-
-          final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-          final addPhotoColor = isDarkMode ? const Color.fromARGB(255, 16, 154, 124) : Colors.green;
-          final deletePhotoColor = isDarkMode ? const Color.fromARGB(255, 103, 58, 183) : Colors.purple;
-
-          return Scaffold(
-            body: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
-                  Stack(
-                    alignment: Alignment.center,
+    return BlocBuilder<ThemeBloc, ThemeState>(
+      builder: (context, stateTheme) {
+        return BlocBuilder<UserBloc, UserState>(
+          builder: (context, stateUser) {
+            if (stateUser is UserLoaded) {
+              _nameController.text = stateUser.user.fullName;
+              _dateOfBirthController.text = stateUser.user.dateOfBirth;
+              _selectedPaymentMethod = stateUser.user.paymentMethod;
+        
+              return Scaffold(
+                body: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: state.user.imageUrl != null
-                            ? MemoryImage(base64Decode(state.user.imageUrl!))
-                            : null,
-                        child: state.user.imageUrl == null
-                            ? const Icon(Icons.person, size: 50)
-                            : null,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        left: -8,
-                        child: IconButton(
-                          icon: Icon(
-                            Icons.add_a_photo,
-                            color: addPhotoColor,
+                      const SizedBox(height: 40),
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          CircleAvatar(
+                            radius: 60,
+                            backgroundImage: stateUser.user.imageUrl != null
+                                ? MemoryImage(base64Decode(stateUser.user.imageUrl!))
+                                : null,
+                            backgroundColor: stateTheme.themeData.appBarTheme.backgroundColor,
+                            child: stateUser.user.imageUrl == null
+                                ? const Icon(
+                                          Icons.person, 
+                                          size: 60,
+                                          color: Colors.white,
+                                        )
+                                : null,
                           ),
-                          onPressed: () => _pickImage(context),
-                        ),
-                      ),
-                      if (state.user.imageUrl != null)
-                        Positioned(
-                          bottom: 0,
-                          right: -8,
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: deletePhotoColor,
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Row(
+                              children: [
+                                if (stateUser.user.imageUrl != null)
+                                  InkWell(
+                                    onTap: () => _removeImage(context),
+                                    child: Container(
+                                      padding: const EdgeInsets.all(5),
+                                      decoration: const BoxDecoration(
+                                        color: Colors.redAccent,
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.delete,
+                                        size: 20,
+                                        color: Colors.white, 
+                                      ),
+                                    ),
+                                  ),
+                                const SizedBox(width: 60),
+                                InkWell(
+                                  onTap: () => _pickImage(context),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(5),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.green,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(
+                                      Icons.add_a_photo,
+                                      size: 20,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                            onPressed: () => _removeImage(context),
                           ),
+                        ],
+                      ),
+                      const SizedBox(height: 50),
+                      _buildEditableField(
+                        label: 'Nome Completo',
+                        controller: _nameController,
+                        isEditing: _isEditingName,
+                        onSave: () {
+                          setState(() => _isEditingName = false);
+                          context.read<UserBloc>().add(UpdateUserName(_nameController.text));
+                        },
+                        onEdit: () => setState(() => _isEditingName = true),
+                      ),
+                      _buildEditableField(
+                        label: 'Data de Nascimento',
+                        controller: _dateOfBirthController,
+                        isEditing: _isEditingDateOfBirth,
+                        onSave: () {
+                          setState(() => _isEditingDateOfBirth = false);
+                          context.read<UserBloc>().add(UpdateUserDateOfBirth(_dateOfBirthController.text));
+                        },
+                        onEdit: () => setState(() => _isEditingDateOfBirth = true),
+                      ),
+                      _buildEditableDropdown(
+                        label: 'Método de Pagamento',
+                        value: _selectedPaymentMethod,
+                        items: const ['Cartão de Crédito', 'Débito', 'Dinheiro', 'PIX'],
+                        isEditing: _isEditingPaymentMethod,
+                        onSave: (newValue) {
+                          setState(() {
+                            _isEditingPaymentMethod = false;
+                            _selectedPaymentMethod = newValue!;
+                          });
+                          context.read<UserBloc>().add(UpdateUserPaymentMethod(_selectedPaymentMethod));
+                        },
+                        onEdit: () => setState(() => _isEditingPaymentMethod = true),
+                      ),
+                      const SizedBox(height: 60),
+                      ElevatedButton(
+                        onPressed: () {
+                          _showChangePasswordDialog(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: stateTheme.themeData.appBarTheme.backgroundColor,
                         ),
+                        child: Text('Alterar Senha', style: TextStyle(color: stateTheme.themeData.iconTheme.color)), 
+                      ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  _buildEditableField(
-                    label: 'Nome Completo',
-                    controller: _nameController,
-                    isEditing: _isEditingName,
-                    onSave: () {
-                      setState(() => _isEditingName = false);
-                      context.read<UserBloc>().add(UpdateUserName(_nameController.text));
-                    },
-                    onEdit: () => setState(() => _isEditingName = true),
-                  ),
-                  _buildEditableField(
-                    label: 'Data de Nascimento',
-                    controller: _dateOfBirthController,
-                    isEditing: _isEditingDateOfBirth,
-                    onSave: () {
-                      setState(() => _isEditingDateOfBirth = false);
-                      context.read<UserBloc>().add(UpdateUserDateOfBirth(_dateOfBirthController.text));
-                    },
-                    onEdit: () => setState(() => _isEditingDateOfBirth = true),
-                  ),
-                  _buildEditableDropdown(
-                    label: 'Método de Pagamento',
-                    value: _selectedPaymentMethod,
-                    items: const ['Cartão de Crédito', 'Débito', 'Dinheiro', 'PIX'],
-                    isEditing: _isEditingPaymentMethod,
-                    onSave: (newValue) {
-                      setState(() {
-                        _isEditingPaymentMethod = false;
-                        _selectedPaymentMethod = newValue!;
-                      });
-                      context.read<UserBloc>().add(UpdateUserPaymentMethod(_selectedPaymentMethod));
-                    },
-                    onEdit: () => setState(() => _isEditingPaymentMethod = true),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                      _showChangePasswordDialog(context);
-                    },
-                    child: const Text('Alterar Senha'),
-                  ),
-                ],
-              ),
-            ),
-          );
-        } else if (state is UserLoading) {
-          return const Center(child: CircularProgressIndicator());
-        } else {
-          return const Center(child: Text('Erro ao carregar dados do usuário.'));
-        }
-      },
+                ),
+              );
+            } else if (stateUser is UserLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else {
+              return const Center(child: Text('Erro ao carregar dados do usuário.'));
+            }
+          },
+        );
+      }
     );
   }
 
@@ -182,7 +209,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         IconButton(
           icon: Icon(isEditing ? Icons.check : Icons.edit),
           onPressed: isEditing ? onSave : onEdit,
-          color: Theme.of(context).iconTheme.color,
+          color: Theme.of(context).primaryIconTheme.color,
         ),
       ],
     );
@@ -214,7 +241,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         IconButton(
           icon: Icon(isEditing ? Icons.check : Icons.edit),
           onPressed: isEditing ? null : onEdit,
-          color: Theme.of(context).iconTheme.color,
+          color: Theme.of(context).primaryIconTheme.color,
         ),
       ],
     );
@@ -272,7 +299,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ));
                   Navigator.of(context).pop();
                 } else {
-                  // Show an error message
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('As senhas não coincidem.')),
+                  );
                 }
               },
               child: const Text('Alterar'),

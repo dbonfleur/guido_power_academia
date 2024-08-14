@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     final username = _usernameController.text;
                     final password = _passwordController.text;
                     BlocProvider.of<AuthenticationBloc>(context).add(
-                      LoginRequested(username, password, _rememberMe, context), // Passando o context aqui
+                      LoginRequested(username, password, _rememberMe, context),
                     );
                   },
                   style: ElevatedButton.styleFrom(

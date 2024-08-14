@@ -23,18 +23,21 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     LoginRequested event,
     Emitter<AuthenticationState> emit,
   ) async {
-    emit(AuthenticationLoading());
     try {
+      emit(AuthenticationLoading());
       final user = await userRepository.getAuth(event.username, event.password);
       if (user != null) {
+        BlocProvider.of<UserBloc>(event.context).add(LoadUser(user.id!));
         if (event.rememberMe) {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setBool('isLoggedIn', true);
           await prefs.setString('username', user.username);
+        } else {
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setBool('isLoggedIn', false);
+          await prefs.remove('username');
         }
         emit(AuthenticationSuccess(user));
-
-        BlocProvider.of<UserBloc>(event.context).add(LoadUser(user.id!));
       } else {
         emit(const AuthenticationFailure('Usuário ou senha inválidos'));
       }

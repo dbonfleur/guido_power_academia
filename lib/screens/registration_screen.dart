@@ -119,7 +119,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                               shape: BoxShape.circle,
                             ),
                             child: const Icon(
-                              Icons.camera_alt,
+                              Icons.add_a_photo,
                               size: 20,
                               color: Colors.white,
                             ),

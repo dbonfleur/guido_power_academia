@@ -112,7 +112,7 @@ class DrawerMenu extends StatelessWidget {
                 const Spacer(),
                 ListTile(
                   leading: const Icon(Icons.exit_to_app, color: Colors.red),
-                  title: const Text('Logout', style: TextStyle(color: Colors.red)),
+                  title: const Text('Deslogar', style: TextStyle(color: Colors.red)),
                   onTap: () {
                     Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
                   },
@@ -142,7 +142,7 @@ class DrawerMenu extends StatelessWidget {
             ? (themeState.themeData.brightness == Brightness.dark
                   ? Colors.black
                   : Colors.white)
-            : themeState.themeData.iconTheme.color
+            : themeState.themeData.primaryIconTheme.color
       ),
       title: Text(
         text,
