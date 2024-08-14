@@ -43,7 +43,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
 
   final List<String> years = List<String>.generate(100, (index) => (DateTime.now().year - index).toString());
 
-  final List<String> paymentMethods = ["Dinheiro", "Crédito", "Débito", "Boleto"];
+  final List<String> paymentMethods = ["Dinheiro", "Crédito", "Débito", "PIX"];
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);

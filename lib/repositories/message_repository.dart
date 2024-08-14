@@ -1,36 +1,36 @@
-import '../models/message_model.dart';
+import '../models/mural_model.dart';
 import '../services/database_helper.dart';
 
-class MessageRepository {
+class MuralRepository {
   final DatabaseHelper databaseHelper;
 
-  MessageRepository({required this.databaseHelper});
+  MuralRepository({required this.databaseHelper});
 
-  Future<List<Message>> getAllMessages() async {
+  Future<List<Mural>> getAllMurals() async {
     final db = await databaseHelper.database;
-    final result = await db.query('messages');
-    return result.map((json) => Message.fromJson(json)).toList();
+    final result = await db.query('murals');
+    return result.map((json) => Mural.fromJson(json)).toList();
   }
 
-  Future<void> insertMessage(Message message) async {
+  Future<void> insertMural(Mural mural) async {
     final db = await databaseHelper.database;
-    await db.insert('messages', message.toJson());
+    await db.insert('murals', mural.toJson());
   }
 
-  Future<void> updateMessage(Message message) async {
+  Future<void> updateMural(Mural mural) async {
     final db = await databaseHelper.database;
     await db.update(
-      'messages',
-      message.toJson(),
+      'murals',
+      mural.toJson(),
       where: 'id = ?',
-      whereArgs: [message.id],
+      whereArgs: [mural.id],
     );
   }
 
-  Future<void> deleteMessage(int id) async {
+  Future<void> deleteMural(int id) async {
     final db = await databaseHelper.database;
     await db.delete(
-      'messages',
+      'murals',
       where: 'id = ?',
       whereArgs: [id],
     );

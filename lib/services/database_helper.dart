@@ -22,7 +22,6 @@ class DatabaseHelper {
       path,
       version: 2,
       onCreate: _createDB,
-      onUpgrade: _onUpgrade,
     );
   }
 
@@ -40,7 +39,7 @@ class DatabaseHelper {
       imageUrl TEXT
     )''';
 
-    const messagesTable = '''CREATE TABLE messages (
+    const muralsTable = '''CREATE TABLE murals (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       content TEXT NOT NULL,
       imageUrl TEXT,
@@ -51,22 +50,6 @@ class DatabaseHelper {
     )''';
 
     await db.execute(userTable);
-    await db.execute(messagesTable);
-  }
-
-  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      const messagesTable = '''CREATE TABLE messages (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        content TEXT NOT NULL,
-        imageUrl TEXT,
-        createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL,
-        userId INTEGER NOT NULL,
-        FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
-      )''';
-
-      await db.execute(messagesTable);
-    }
+    await db.execute(muralsTable);
   }
 }

@@ -5,12 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'blocs/authentication/authentication_bloc.dart';
-import 'blocs/message/message_event.dart';
+import 'blocs/mural/mural_event.dart';
 import 'blocs/registration/registration_bloc.dart';
 import 'blocs/theme/theme_bloc.dart';
 import 'blocs/theme/theme_state.dart';
 import 'blocs/user/user_bloc.dart';
-import 'blocs/message/message_bloc.dart';
+import 'blocs/mural/mural_bloc.dart';
 import 'repositories/user_repository.dart';
 import 'repositories/message_repository.dart'; 
 import 'services/database_helper.dart';
@@ -32,27 +32,27 @@ void main() async {
   }
 
   final userRepository = UserRepository(DatabaseHelper.instance);
-  final messageRepository = MessageRepository(databaseHelper: DatabaseHelper.instance);
+  final muralRepository = MuralRepository(databaseHelper: DatabaseHelper.instance);
 
   final prefs = await SharedPreferences.getInstance();
   final bool introSeen = prefs.getBool('introSeen') ?? false;
 
   runApp(MyApp(
     userRepository: userRepository,
-    messageRepository: messageRepository,
+    muralRepository: muralRepository,
     introSeen: introSeen,
   ));
 }
 
 class MyApp extends StatelessWidget {
   final UserRepository userRepository;
-  final MessageRepository messageRepository;
+  final MuralRepository muralRepository;
   final bool introSeen;
 
   const MyApp({
     super.key,
     required this.userRepository,
-    required this.messageRepository,
+    required this.muralRepository,
     required this.introSeen,
   });
 
@@ -72,8 +72,8 @@ class MyApp extends StatelessWidget {
         BlocProvider<UserBloc>(
           create: (context) => UserBloc(userRepository),
         ),
-        BlocProvider<MessageBloc>(
-          create: (context) => MessageBloc(messageRepository: messageRepository)..add(LoadMessages()),
+        BlocProvider<MuralBloc>(
+          create: (context) => MuralBloc(muralRepo: muralRepository)..add(LoadMurals()),
         ),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(

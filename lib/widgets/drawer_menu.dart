@@ -113,7 +113,8 @@ class DrawerMenu extends StatelessWidget {
                 ListTile(
                   leading: const Icon(Icons.exit_to_app, color: Colors.red),
                   title: const Text('Deslogar', style: TextStyle(color: Colors.red)),
-                  onTap: () {
+                  onTap: () async {
+                    context.read<UserBloc>().add(LogoutUserEvent());
                     Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
                   },
                 ),
@@ -137,20 +138,20 @@ class DrawerMenu extends StatelessWidget {
 
     return ListTile(
       leading: Icon(
-        icon, 
-        color: isSelected 
+        icon,
+        color: isSelected
             ? (themeState.themeData.brightness == Brightness.dark
                   ? Colors.black
                   : Colors.white)
-            : themeState.themeData.primaryIconTheme.color
+            : themeState.themeData.primaryIconTheme.color,
       ),
       title: Text(
         text,
         style: TextStyle(
-          color: isSelected 
+          color: isSelected
               ? (themeState.themeData.brightness == Brightness.dark
                   ? Colors.black
-                  : Colors.white) 
+                  : Colors.white)
               : themeState.themeData.textTheme.bodyMedium?.color,
         ),
       ),

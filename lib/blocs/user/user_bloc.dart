@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../repositories/user_repository.dart';
 import '../../models/user_model.dart';
 
@@ -16,6 +17,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<UpdateUserPaymentMethod>(_onUpdateUserPaymentMethod);
     on<UpdateUserImage>(_onUpdateUserImage);
     on<UpdateUserPassword>(_onUpdateUserPassword);
+    on<LogoutUserEvent>(_onLogoutUser);
   }
 
   Future<void> _onLoadUser(
@@ -23,7 +25,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     Emitter<UserState> emit,
   ) async {
     try {
-      emit(UserLoading());
       final user = await userRepository.getUserById(event.userId);
       if (user != null) {
         emit(UserLoaded(user));
@@ -36,52 +37,60 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   }
 
   Future<void> _onUpdateUserName(UpdateUserName event, Emitter<UserState> emit) async {
-  if (state is UserLoaded) {
-    final updatedUser = (state as UserLoaded).user.copyWithUserName(fullName: event.fullName);
-    await userRepository.updateUser(updatedUser);
-    emit(UserLoaded(updatedUser));
-  }
-}
-
-Future<void> _onUpdateUserDateOfBirth(UpdateUserDateOfBirth event, Emitter<UserState> emit) async {
-  if (state is UserLoaded) {
-    final updatedUser = (state as UserLoaded).user.copyWithDateOfBirth(dateOfBirth: event.dateOfBirth);
-    await userRepository.updateUser(updatedUser);
-    emit(UserLoaded(updatedUser));
-  }
-}
-
-Future<void> _onUpdateUserPaymentMethod(UpdateUserPaymentMethod event, Emitter<UserState> emit) async {
-  if (state is UserLoaded) {
-    final updatedUser = (state as UserLoaded).user.copyWithPaymentMethod(paymentMethod: event.paymentMethod);
-    await userRepository.updateUser(updatedUser);
-    emit(UserLoaded(updatedUser));
-  }
-}
-
-Future<void> _onUpdateUserImage(UpdateUserImage event, Emitter<UserState> emit) async {
-  if (state is UserLoaded) {
-    final user = (state as UserLoaded).user;
-    final updatedUser = user.copyWithUserImage(imageUrl: event.imageUrl);
-    
-    await userRepository.updateUser(updatedUser);
-    emit(UserLoaded(updatedUser));
-  }
-}
-
-Future<void> _onUpdateUserPassword(UpdateUserPassword event, Emitter<UserState> emit) async {
-  if (state is UserLoaded) {
-    final user = (state as UserLoaded).user;
-    final hashedOldPassword = User.hashPassword(event.oldPassword);
-    
-    if (user.password == hashedOldPassword) {
-      final updatedUser = user.copyWithPassword(password: User.hashPassword(event.newPassword));
+    if (state is UserLoaded) {
+      final updatedUser = (state as UserLoaded).user.copyWithUserName(fullName: event.fullName);
       await userRepository.updateUser(updatedUser);
       emit(UserLoaded(updatedUser));
-    } else {
-      emit(const UserError('Senha antiga não confere'));
     }
   }
-}
 
+  Future<void> _onUpdateUserDateOfBirth(UpdateUserDateOfBirth event, Emitter<UserState> emit) async {
+    if (state is UserLoaded) {
+      final updatedUser = (state as UserLoaded).user.copyWithDateOfBirth(dateOfBirth: event.dateOfBirth);
+      await userRepository.updateUser(updatedUser);
+      emit(UserLoaded(updatedUser));
+    }
+  }
+
+  Future<void> _onUpdateUserPaymentMethod(UpdateUserPaymentMethod event, Emitter<UserState> emit) async {
+    if (state is UserLoaded) {
+      final updatedUser = (state as UserLoaded).user.copyWithPaymentMethod(paymentMethod: event.paymentMethod);
+      await userRepository.updateUser(updatedUser);
+      emit(UserLoaded(updatedUser));
+    }
+  }
+
+  Future<void> _onUpdateUserImage(UpdateUserImage event, Emitter<UserState> emit) async {
+    if (state is UserLoaded) {
+      final user = (state as UserLoaded).user;
+      final updatedUser = user.copyWithUserImage(imageUrl: event.imageUrl);
+      
+      await userRepository.updateUser(updatedUser);
+      emit(UserLoaded(updatedUser));
+    }
+  }
+
+  Future<void> _onUpdateUserPassword(UpdateUserPassword event, Emitter<UserState> emit) async {
+    if (state is UserLoaded) {
+      final user = (state as UserLoaded).user;
+      final hashedOldPassword = User.hashPassword(event.oldPassword);
+      
+      if (user.password == hashedOldPassword) {
+        final updatedUser = user.copyWithPassword(password: User.hashPassword(event.newPassword));
+        await userRepository.updateUser(updatedUser);
+        emit(UserLoaded(updatedUser));
+      } else {
+        emit(const UserError('Senha antiga não confere'));
+      }
+    }
+  }
+
+  void _onLogoutUser(LogoutUserEvent event, Emitter<UserState> emit) async {
+    final prefs = await SharedPreferences.getInstance();
+    bool rememberMe = prefs.getBool('rememberMe') ?? false;
+    if (!rememberMe) {
+      await prefs.clear(); 
+    }
+    emit(UserInitial());
+  }
 }

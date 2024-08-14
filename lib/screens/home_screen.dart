@@ -7,7 +7,7 @@ import '../blocs/page/page_event.dart';
 import '../blocs/page/page_state.dart';
 import 'contract_screen.dart';
 import 'finance_screen.dart';
-import 'initial_screen.dart';
+import 'mural_screen.dart';
 import 'settings_screen.dart';
 import 'workout_screen.dart';
 
@@ -15,7 +15,7 @@ class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
 
   final List<Widget> _pages = [
-    const InitialScreen(),
+    const MuralScreen(),
     const WorkoutScreen(),
     const FinanceScreen(),
     const ContractScreen(),
