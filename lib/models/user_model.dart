@@ -126,7 +126,34 @@ class User {
       imageUrl: imageUrl,
     );
   }
+
+  static fromMap(Map<String, Object?> map) {
+    return User(
+      id: map['id'] as int?,
+      username: map['username'] as String,
+      fullName: map['fullName'] as String,
+      dateOfBirth: map['dateOfBirth'] as String,
+      email: map['email'] as String,
+      password: map['password'] as String,
+      paymentMethod: map['paymentMethod'] as String,
+      contractDuration: map['contractDuration'] as int,
+      accountType: map['accountType'] as String,
+      imageUrl: map['imageUrl'] as String?,
+    );
+  }
+
+  copyWithAccountType(String accType) {
+    return User(
+      id: id,
+      username: username,
+      fullName: fullName,
+      dateOfBirth: dateOfBirth,
+      email: email,
+      password: password,
+      paymentMethod: paymentMethod,
+      contractDuration: contractDuration,
+      accountType: accType,
+      imageUrl: imageUrl,
+    );
+  }
 }
-
-
-

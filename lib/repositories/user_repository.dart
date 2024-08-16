@@ -99,6 +99,19 @@ class UserRepository {
     }
   }
 
+  Future<List> getUsersByName(String name) async {
+    final db = await databaseHelper.database;
+    final maps = await db.query(
+      'user',
+      where: 'fullName LIKE ? AND accountType = ?',
+      whereArgs: ['%$name%', 'aluno'],
+    );
+
+    return maps.isNotEmpty
+        ? maps.map((map) => User.fromMap(map)).toList()
+        : <User>[];
+  }
+
   Future<User?> getUserById(int id) async {
     final db = await databaseHelper.database;
     final maps = await db.query(
@@ -135,5 +148,31 @@ class UserRepository {
     } else {
       return null;
     }
+  }
+
+  Future<List> getUsersByAccountType(String accountType) async {
+    final db = await databaseHelper.database;
+    final maps = await db.query(
+      'user',
+      where: 'accountType = ?',
+      whereArgs: [accountType],
+    );
+
+    return maps.isNotEmpty
+        ? maps.map((map) => User.fromMap(map)).toList()
+        : <User>[];
+  }
+
+  Future <List> getUsersByFullName(String fullName) async {
+    final db = await databaseHelper.database;
+    final maps = await db.query(
+      'user',
+      where: 'fullName LIKE ?',
+      whereArgs: ['%$fullName%'],
+    );
+
+    return maps.isNotEmpty
+        ? maps.map((map) => User.fromMap(map)).toList()
+        : <User>[];
   }
 }

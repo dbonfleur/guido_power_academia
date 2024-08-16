@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../widgets/treino/aluno_workout_widget.dart';
-import '../widgets/treino/treinador_admin_workout_widget.dart';
+import '../widgets/workout/aluno_workout_widget.dart';
+import '../widgets/workout/treinador_admin_workout_widget.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/user/user_bloc.dart';
 

@@ -10,7 +10,7 @@ import '../../blocs/treino/treino_bloc.dart';
 import '../../blocs/treino/treino_event.dart';
 import '../../blocs/treino/treino_state.dart';
 import '../../models/treino_model.dart';
-import 'multi_select_treino_dropdown.dart';
+import 'multi_select_workout_dropdown.dart';
 
 class TreinadorAdminWorkoutWidget extends StatefulWidget {
   const TreinadorAdminWorkoutWidget({super.key});
@@ -221,8 +221,8 @@ class _TreinadorAdminWorkoutWidgetState extends State<TreinadorAdminWorkoutWidge
               BlocBuilder<TreinoBloc, TreinoState>(
                 builder: (context, state) {
                   if (state is TreinoLoaded) {
-                    return MultiSelectTreinoDropdown(
-                      treinos: state.treinos,
+                    return MultiSelectWorkoutDropdown(
+                      workoutList: state.treinos,
                       onChanged: (List<Treino> selected) {
                         selectedTreinos = selected;
                       },

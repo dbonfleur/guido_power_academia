@@ -2,12 +2,14 @@ import 'dart:io';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guido_power_academia/blocs/search/search_bloc.dart';
 import 'package:guido_power_academia/blocs/treino/historico_treino_bloc.dart';
 import 'package:guido_power_academia/blocs/treino/pacote_treino_bloc.dart';
 import 'package:guido_power_academia/blocs/treino/pesos_treino_bloc.dart';
 import 'package:guido_power_academia/blocs/treino/treino_bloc.dart';
 import 'package:guido_power_academia/blocs/treino/user_pacote_treino_bloc.dart';
 import 'package:guido_power_academia/repositories/treino_repository.dart';
+import 'package:nested/nested.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'blocs/authentication/authentication_bloc.dart';
@@ -15,6 +17,7 @@ import 'blocs/mural/mural_event.dart';
 import 'blocs/registration/registration_bloc.dart';
 import 'blocs/theme/theme_bloc.dart';
 import 'blocs/theme/theme_state.dart';
+import 'blocs/trainer/trainer_bloc.dart';
 import 'blocs/user/user_bloc.dart';
 import 'blocs/mural/mural_bloc.dart';
 import 'repositories/user_repository.dart';
@@ -69,38 +72,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider<AuthenticationBloc>(
-          create: (context) => AuthenticationBloc(userRepository),
-        ),
-        BlocProvider<RegistrationBloc>(
-          create: (context) => RegistrationBloc(userRepository),
-        ),
-        BlocProvider<ThemeBloc>(
-          create: (context) => ThemeBloc(),
-        ),
-        BlocProvider<UserBloc>(
-          create: (context) => UserBloc(userRepository),
-        ),
-        BlocProvider<MuralBloc>(
-          create: (context) => MuralBloc(muralRepo: muralRepository)..add(LoadMurals()),
-        ),
-        BlocProvider(
-          create: (context) => TreinoBloc(treinoRepository),
-        ),
-        BlocProvider(
-          create: (context) => UserPacoteTreinoBloc(treinoRepository)
-        ),
-        BlocProvider(
-          create: (context) => PesosTreinoBloc(treinoRepository)
-        ),
-        BlocProvider(
-          create: (context) => PacoteTreinoBloc(treinoRepository)
-        ),
-        BlocProvider(
-          create: (context) => HistoricoTreinoBloc(treinoRepository),
-        ),
-      ],
+      providers: blocProviders,
       child: BlocBuilder<ThemeBloc, ThemeState>(
         builder: (context, state) {
           return MaterialApp(
@@ -119,5 +91,46 @@ class MyApp extends StatelessWidget {
         },
       ),
     );
+  }
+
+  List<SingleChildWidget> get blocProviders {
+    return [
+      BlocProvider<AuthenticationBloc>(
+        create: (context) => AuthenticationBloc(userRepository),
+      ),
+      BlocProvider<RegistrationBloc>(
+        create: (context) => RegistrationBloc(userRepository),
+      ),
+      BlocProvider<ThemeBloc>(
+        create: (context) => ThemeBloc(),
+      ),
+      BlocProvider<UserBloc>(
+        create: (context) => UserBloc(userRepository),
+      ),
+      BlocProvider<MuralBloc>(
+        create: (context) => MuralBloc(muralRepo: muralRepository)..add(LoadMurals()),
+      ),
+      BlocProvider(
+        create: (context) => TreinoBloc(treinoRepository),
+      ),
+      BlocProvider(
+        create: (context) => UserPacoteTreinoBloc(treinoRepository)
+      ),
+      BlocProvider(
+        create: (context) => PesosTreinoBloc(treinoRepository)
+      ),
+      BlocProvider(
+        create: (context) => PacoteTreinoBloc(treinoRepository)
+      ),
+      BlocProvider(
+        create: (context) => HistoricoTreinoBloc(treinoRepository),
+      ),
+      BlocProvider(
+        create: (context) => TrainerBloc(userRepository),
+      ),
+      BlocProvider(
+        create: (context) => SearchBloc(userRepository),
+      ),
+    ];
   }
 }
