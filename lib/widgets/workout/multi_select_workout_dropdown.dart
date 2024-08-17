@@ -42,6 +42,7 @@ class _MultiSelectWorkoutDropdownState extends State<MultiSelectWorkoutDropdown>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ExpansionTile(
+          leading: const Icon(Icons.fitness_center),
           title: const Text('Tipo de Treino'),
           children: [
             Padding(

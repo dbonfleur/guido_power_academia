@@ -74,7 +74,11 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     Emitter<AuthenticationState> emit,
   ) async {
     final prefs = await SharedPreferences.getInstance();
+    final introSeen =prefs.getBool('introSeen') ?? false;
     await prefs.clear();
+    if(introSeen){
+      prefs.setBool('introSeen', true); 
+    }
     emit(AuthenticationInitial());
   }
 }

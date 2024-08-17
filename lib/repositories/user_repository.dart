@@ -27,35 +27,12 @@ class UserRepository {
     final hashedPassword = User.hashPassword(password);
     final maps = await db.query(
       'user',
-      columns: [
-        'id',
-        'username',
-        'fullName',
-        'dateOfBirth',
-        'email',
-        'password',
-        'paymentMethod',
-        'contractDuration',
-        'accountType',
-        'imageUrl'
-      ],
       where: 'username = ? AND password = ?',
       whereArgs: [username, hashedPassword],
     );
 
     if (maps.isNotEmpty) {
-      return User(
-        id: maps.first['id'] as int?,
-        username: maps.first['username'] as String,
-        fullName: maps.first['fullName'] as String,
-        dateOfBirth: maps.first['dateOfBirth'] as String,
-        email: maps.first['email'] as String,
-        password: maps.first['password'] as String,
-        paymentMethod: maps.first['paymentMethod'] as String,
-        contractDuration: maps.first['contractDuration'] as int,
-        accountType: maps.first['accountType'] as String,
-        imageUrl: maps.first['imageUrl'] as String?,
-      );
+      return maps.map((map) => User.fromMap(map)).first;
     } else {
       return null;
     }
@@ -65,35 +42,12 @@ class UserRepository {
     final db = await databaseHelper.database;
     final maps = await db.query(
       'user',
-      columns: [
-        'id',
-        'username',
-        'fullName',
-        'dateOfBirth',
-        'email',
-        'password',
-        'paymentMethod',
-        'contractDuration',
-        'accountType',
-        'imageUrl'
-      ],
       where: 'username = ?',
       whereArgs: [username],
     );
 
     if (maps.isNotEmpty) {
-      return User(
-        id: maps.first['id'] as int?,
-        username: maps.first['username'] as String,
-        fullName: maps.first['fullName'] as String,
-        dateOfBirth: maps.first['dateOfBirth'] as String,
-        email: maps.first['email'] as String,
-        password: maps.first['password'] as String,
-        paymentMethod: maps.first['paymentMethod'] as String,
-        contractDuration: maps.first['contractDuration'] as int,
-        accountType: maps.first['accountType'] as String,
-        imageUrl: maps.first['imageUrl'] as String?,
-      );
+      return maps.map((map) => User.fromMap(map)).first;
     } else {
       return null;
     }
@@ -116,35 +70,12 @@ class UserRepository {
     final db = await databaseHelper.database;
     final maps = await db.query(
       'user',
-      columns: [
-        'id',
-        'username',
-        'fullName',
-        'dateOfBirth',
-        'email',
-        'password',
-        'paymentMethod',
-        'contractDuration',
-        'accountType',
-        'imageUrl'
-      ],
       where: 'id = ?',
       whereArgs: [id],
     );
 
     if (maps.isNotEmpty) {
-      return User(
-        id: maps.first['id'] as int?,
-        username: maps.first['username'] as String,
-        fullName: maps.first['fullName'] as String,
-        dateOfBirth: maps.first['dateOfBirth'] as String,
-        email: maps.first['email'] as String,
-        password: maps.first['password'] as String,
-        paymentMethod: maps.first['paymentMethod'] as String,
-        contractDuration: maps.first['contractDuration'] as int,
-        accountType: maps.first['accountType'] as String,
-        imageUrl: maps.first['imageUrl'] as String?,
-      );
+      return maps.map((map) => User.fromMap(map)).first;
     } else {
       return null;
     }

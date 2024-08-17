@@ -14,10 +14,22 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<LoadUser>(_onLoadUser);
     on<UpdateUserName>(_onUpdateUserName);
     on<UpdateUserDateOfBirth>(_onUpdateUserDateOfBirth);
-    on<UpdateUserPaymentMethod>(_onUpdateUserPaymentMethod);
     on<UpdateUserImage>(_onUpdateUserImage);
     on<UpdateUserPassword>(_onUpdateUserPassword);
     on<LogoutUserEvent>(_onLogoutUser);
+    on<CreateUser>(_onCreateUser);
+  }
+
+  Future<void> _onCreateUser(
+    CreateUser event,
+    Emitter<UserState> emit,
+  ) async {
+    try {
+      final id = await userRepository.createUser(event.user);
+      emit(UserCreated(id: id));
+    } catch (e) {
+      emit(UserError(e.toString()));
+    }
   }
 
   Future<void> _onLoadUser(
@@ -38,7 +50,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   Future<void> _onUpdateUserName(UpdateUserName event, Emitter<UserState> emit) async {
     if (state is UserLoaded) {
-      final updatedUser = (state as UserLoaded).user.copyWithUserName(fullName: event.fullName);
+      final updatedUser = (state as UserLoaded).user
+          .copyWithUserName(fullName: event.fullName)
+          .copyWithUpdatedAt(DateTime.now());
       await userRepository.updateUser(updatedUser);
       emit(UserLoaded(updatedUser));
     }
@@ -46,15 +60,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   Future<void> _onUpdateUserDateOfBirth(UpdateUserDateOfBirth event, Emitter<UserState> emit) async {
     if (state is UserLoaded) {
-      final updatedUser = (state as UserLoaded).user.copyWithDateOfBirth(dateOfBirth: event.dateOfBirth);
-      await userRepository.updateUser(updatedUser);
-      emit(UserLoaded(updatedUser));
-    }
-  }
-
-  Future<void> _onUpdateUserPaymentMethod(UpdateUserPaymentMethod event, Emitter<UserState> emit) async {
-    if (state is UserLoaded) {
-      final updatedUser = (state as UserLoaded).user.copyWithPaymentMethod(paymentMethod: event.paymentMethod);
+      final updatedUser = (state as UserLoaded).user
+          .copyWithDateOfBirth(dateOfBirth: event.dateOfBirth)
+          .copyWithUpdatedAt(DateTime.now());
       await userRepository.updateUser(updatedUser);
       emit(UserLoaded(updatedUser));
     }
@@ -63,8 +71,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   Future<void> _onUpdateUserImage(UpdateUserImage event, Emitter<UserState> emit) async {
     if (state is UserLoaded) {
       final user = (state as UserLoaded).user;
-      final updatedUser = user.copyWithUserImage(imageUrl: event.imageUrl);
-      
+      final updatedUser = user
+          .copyWithUserImage(imageUrl: event.imageUrl)
+          .copyWithUpdatedAt(DateTime.now());
       await userRepository.updateUser(updatedUser);
       emit(UserLoaded(updatedUser));
     }
@@ -76,7 +85,9 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       final hashedOldPassword = User.hashPassword(event.oldPassword);
       
       if (user.password == hashedOldPassword) {
-        final updatedUser = user.copyWithPassword(password: User.hashPassword(event.newPassword));
+        final updatedUser = user
+            .copyWithPassword(password: User.hashPassword(event.newPassword))
+            .copyWithUpdatedAt(DateTime.now());
         await userRepository.updateUser(updatedUser);
         emit(UserLoaded(updatedUser));
       } else {

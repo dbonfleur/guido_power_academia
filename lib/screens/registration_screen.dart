@@ -320,6 +320,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         contractDuration: contractDuration,
                         accountType: 'aluno',
                         imageUrl: _imageFile?.path,
+                        context: context,
                       ),
                     );
                   },

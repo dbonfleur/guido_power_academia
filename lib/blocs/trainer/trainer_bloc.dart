@@ -25,7 +25,9 @@ class TrainerBloc extends Bloc<TrainerEvent, TrainerState> {
   Future<void> _onAddTrainer(AddTrainer event, Emitter<TrainerState> emit) async {
     if (state is TrainersLoaded) {
       try {
-        final updatedUser = event.user.copyWithAccountType('treinador');
+        final updatedUser = event.user
+            .copyWithAccountType('treinador')
+            .copyWithUpdatedAt(DateTime.now());
         await userRepository.updateUser(updatedUser);
         final updatedTrainers = List.from((state as TrainersLoaded).trainers)..add(updatedUser);
         emit(TrainersLoaded(updatedTrainers));
@@ -38,7 +40,9 @@ class TrainerBloc extends Bloc<TrainerEvent, TrainerState> {
   Future<void> _onRemoveTrainer(RemoveTrainer event, Emitter<TrainerState> emit) async {
     if (state is TrainersLoaded) {
       try {
-        final updatedUser = event.user.copyWithAccountType('aluno');
+        final updatedUser = event.user
+            .copyWithAccountType('aluno')
+            .copyWithUpdatedAt(DateTime.now());
         await userRepository.updateUser(updatedUser);
         final updatedTrainers = List.from((state as TrainersLoaded).trainers)
           ..removeWhere((trainer) => trainer.id == event.user.id);

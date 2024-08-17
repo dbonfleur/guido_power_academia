@@ -17,11 +17,11 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _isEditingName = false;
   bool _isEditingDateOfBirth = false;
-  bool _isEditingPaymentMethod = false;
+  // bool _isEditingPaymentMethod = false;
 
   late TextEditingController _nameController;
   late TextEditingController _dateOfBirthController;
-  late String _selectedPaymentMethod;
+  // late String _selectedPaymentMethod;
 
   @override
   void initState() {
@@ -62,7 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             if (stateUser is UserLoaded) {
               _nameController.text = stateUser.user.fullName;
               _dateOfBirthController.text = stateUser.user.dateOfBirth;
-              _selectedPaymentMethod = stateUser.user.paymentMethod;
+              // _selectedPaymentMethod = stateUser.user.paymentMethod;
         
               return Scaffold(
                 body: Padding(
@@ -151,20 +151,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         },
                         onEdit: () => setState(() => _isEditingDateOfBirth = true),
                       ),
-                      _buildEditableDropdown(
-                        label: 'Método de Pagamento',
-                        value: _selectedPaymentMethod,
-                        items: const ['Cartão de Crédito', 'Débito', 'Dinheiro', 'PIX'],
-                        isEditing: _isEditingPaymentMethod,
-                        onSave: (newValue) {
-                          setState(() {
-                            _isEditingPaymentMethod = false;
-                            _selectedPaymentMethod = newValue!;
-                          });
-                          context.read<UserBloc>().add(UpdateUserPaymentMethod(_selectedPaymentMethod));
-                        },
-                        onEdit: () => setState(() => _isEditingPaymentMethod = true),
-                      ),
+                      // _buildEditableDropdown(
+                      //   label: 'Método de Pagamento',
+                      //   value: _selectedPaymentMethod,
+                      //   items: const ['Cartão de Crédito', 'Débito', 'Dinheiro', 'PIX'],
+                      //   isEditing: _isEditingPaymentMethod,
+                      //   onSave: (newValue) {
+                      //     setState(() {
+                      //       _isEditingPaymentMethod = false;
+                      //       _selectedPaymentMethod = newValue!;
+                      //     });
+                      //     context.read<UserBloc>().add(UpdateUserPaymentMethod(_selectedPaymentMethod));
+                      //   },
+                      //   onEdit: () => setState(() => _isEditingPaymentMethod = true),
+                      // ),
                       const SizedBox(height: 60),
                       ElevatedButton(
                         onPressed: () {
@@ -215,37 +215,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildEditableDropdown({
-    required String label,
-    required String value,
-    required List<String> items,
-    required bool isEditing,
-    required ValueChanged<String?> onSave,
-    required VoidCallback onEdit,
-  }) {
-    return Row(
-      children: [
-        Expanded(
-          child: DropdownButtonFormField<String>(
-            value: value,
-            items: items.map((String item) {
-              return DropdownMenuItem<String>(
-                value: item,
-                child: Text(item),
-              );
-            }).toList(),
-            onChanged: isEditing ? onSave : null,
-            decoration: InputDecoration(labelText: label),
-          ),
-        ),
-        IconButton(
-          icon: Icon(isEditing ? Icons.check : Icons.edit),
-          onPressed: isEditing ? null : onEdit,
-          color: Theme.of(context).primaryIconTheme.color,
-        ),
-      ],
-    );
-  }
+  // Widget _buildEditableDropdown({
+  //   required String label,
+  //   required String value,
+  //   required List<String> items,
+  //   required bool isEditing,
+  //   required ValueChanged<String?> onSave,
+  //   required VoidCallback onEdit,
+  // }) {
+  //   return Row(
+  //     children: [
+  //       Expanded(
+  //         child: DropdownButtonFormField<String>(
+  //           value: value,
+  //           items: items.map((String item) {
+  //             return DropdownMenuItem<String>(
+  //               value: item,
+  //               child: Text(item),
+  //             );
+  //           }).toList(),
+  //           onChanged: isEditing ? onSave : null,
+  //           decoration: InputDecoration(labelText: label),
+  //         ),
+  //       ),
+  //       IconButton(
+  //         icon: Icon(isEditing ? Icons.check : Icons.edit),
+  //         onPressed: isEditing ? null : onEdit,
+  //         color: Theme.of(context).primaryIconTheme.color,
+  //       ),
+  //     ],
+  //   );
+  // }
 
   void _showChangePasswordDialog(BuildContext context) {
     showDialog(

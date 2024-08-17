@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:guido_power_academia/blocs/contract/contract_bloc.dart';
 import 'package:guido_power_academia/blocs/search/search_bloc.dart';
 import 'package:guido_power_academia/blocs/treino/historico_treino_bloc.dart';
 import 'package:guido_power_academia/blocs/treino/pacote_treino_bloc.dart';
@@ -14,12 +15,15 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'blocs/authentication/authentication_bloc.dart';
 import 'blocs/mural/mural_event.dart';
+import 'blocs/payment/payment_bloc.dart';
 import 'blocs/registration/registration_bloc.dart';
 import 'blocs/theme/theme_bloc.dart';
 import 'blocs/theme/theme_state.dart';
 import 'blocs/trainer/trainer_bloc.dart';
 import 'blocs/user/user_bloc.dart';
 import 'blocs/mural/mural_bloc.dart';
+import 'repositories/contract_repository.dart';
+import 'repositories/payment_repository.dart';
 import 'repositories/user_repository.dart';
 import 'repositories/message_repository.dart'; 
 import 'services/database_helper.dart';
@@ -43,6 +47,8 @@ void main() async {
   final userRepository = UserRepository(DatabaseHelper.instance);
   final muralRepository = MuralRepository(databaseHelper: DatabaseHelper.instance);
   final treinoRepository = TreinoRepository(DatabaseHelper.instance);
+  final contractRepository = ContractRepository(DatabaseHelper.instance);
+  final paymentRepository = PaymentRepository(DatabaseHelper.instance);
 
   final prefs = await SharedPreferences.getInstance();
   final bool introSeen = prefs.getBool('introSeen') ?? false;
@@ -51,6 +57,8 @@ void main() async {
     userRepository: userRepository,
     muralRepository: muralRepository,
     treinoRepository: treinoRepository,
+    contractRepository: contractRepository,
+    paymentRepository: paymentRepository,
     introSeen: introSeen,
   ));
 }
@@ -59,6 +67,8 @@ class MyApp extends StatelessWidget {
   final UserRepository userRepository;
   final MuralRepository muralRepository;
   final TreinoRepository treinoRepository;
+  final ContractRepository contractRepository;
+  final PaymentRepository paymentRepository;
   final bool introSeen;
 
   const MyApp({
@@ -66,6 +76,8 @@ class MyApp extends StatelessWidget {
     required this.userRepository,
     required this.muralRepository,
     required this.treinoRepository,
+    required this.contractRepository,
+    required this.paymentRepository,
     required this.introSeen,
   });
 
@@ -99,7 +111,7 @@ class MyApp extends StatelessWidget {
         create: (context) => AuthenticationBloc(userRepository),
       ),
       BlocProvider<RegistrationBloc>(
-        create: (context) => RegistrationBloc(userRepository),
+        create: (context) => RegistrationBloc(),
       ),
       BlocProvider<ThemeBloc>(
         create: (context) => ThemeBloc(),
@@ -130,6 +142,12 @@ class MyApp extends StatelessWidget {
       ),
       BlocProvider(
         create: (context) => SearchBloc(userRepository),
+      ),
+      BlocProvider(
+        create: (context) => ContractBloc(contractRepository,)
+      ),
+      BlocProvider(
+        create: (context) => PaymentBloc(paymentRepository)
       ),
     ];
   }

@@ -13,10 +13,11 @@ class RegisterUser extends RegistrationEvent {
   final String dateOfBirth;
   final String email;
   final String password;
+  final String accountType;
   final String paymentMethod;
   final int contractDuration;
-  final String accountType;
   final String? imageUrl;
+  final BuildContext context;
 
   const RegisterUser({
     required this.username,
@@ -24,22 +25,11 @@ class RegisterUser extends RegistrationEvent {
     required this.dateOfBirth,
     required this.email,
     required this.password,
+    required this.accountType,
     required this.paymentMethod,
     required this.contractDuration,
-    required this.accountType,
     this.imageUrl,
+    required this.context,
   });
-
-  @override
-  List<Object?> get props => [
-        username,
-        fullName,
-        dateOfBirth,
-        email,
-        password,
-        paymentMethod,
-        contractDuration,
-        accountType,
-        imageUrl,
-      ];
 }
+

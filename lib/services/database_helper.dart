@@ -27,17 +27,38 @@ class DatabaseHelper {
 
   Future _createDB(Database db, int version) async {
     const userTable = '''CREATE TABLE user (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      username TEXT NOT NULL,
-      fullName TEXT NOT NULL,
-      dateOfBirth TEXT NOT NULL,
-      email TEXT NOT NULL,
-      password TEXT NOT NULL,
-      paymentMethod TEXT NOT NULL,
-      contractDuration INTEGER NOT NULL,
-      accountType TEXT NOT NULL,
-      imageUrl TEXT
-    )''';
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT NOT NULL,
+    fullName TEXT NOT NULL,
+    dateOfBirth TEXT NOT NULL,
+    email TEXT NOT NULL,
+    password TEXT NOT NULL,
+    accountType TEXT NOT NULL,
+    imageUrl TEXT,
+    createdAt TEXT NOT NULL,
+    updatedAt TEXT NOT NULL
+  )''';
+
+  const contractTable = '''CREATE TABLE contract (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    userId INTEGER NOT NULL,
+    contractDurationMonths INTEGER NOT NULL,
+    createdAt TEXT NOT NULL,
+    isValid INTEGER NOT NULL,
+    FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
+  )''';
+
+  const paymentTable = '''CREATE TABLE payment (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    contractId INTEGER NOT NULL,
+    value INTEGER NOT NULL,
+    paymentMethod TEXT NOT NULL,
+    numberOfParcel INTEGER NOT NULL,
+    dueDate TEXT NOT NULL,
+    updatedAt TEXT NOT NULL,
+    wasPaid INTEGER NOT NULL,
+    FOREIGN KEY (contractId) REFERENCES contract(id) ON DELETE CASCADE
+  )''';
 
     const muralsTable = '''CREATE TABLE murals (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,6 +120,8 @@ class DatabaseHelper {
     )''';
 
     await db.execute(userTable);
+    await db.execute(contractTable);
+    await db.execute(paymentTable);
     await db.execute(muralsTable);
     await db.execute(treinoTable);
     await db.execute(pacoteTreinoTable);

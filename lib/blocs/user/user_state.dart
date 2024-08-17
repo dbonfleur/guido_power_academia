@@ -7,6 +7,16 @@ abstract class UserState extends Equatable {
   List<Object?> get props => [];
 }
 
+class UserCreated extends UserState {
+  final int id;
+
+  const UserCreated({required this.id});
+
+  @override
+  List<Object?> get props => [id];
+}
+
+
 class UserInitial extends UserState {}
 
 class UserLoading extends UserState {}

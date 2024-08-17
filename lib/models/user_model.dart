@@ -9,10 +9,10 @@ class User {
   final String dateOfBirth;
   final String email;
   final String password;
-  final String paymentMethod;
-  final int contractDuration;
   final String accountType;
   final String? imageUrl;
+  final DateTime createdAt;
+  final DateTime updatedAt;
 
   User({
     this.id,
@@ -21,17 +21,11 @@ class User {
     required this.dateOfBirth,
     required this.email,
     required this.password,
-    required this.paymentMethod,
-    required this.contractDuration,
     required this.accountType,
     this.imageUrl,
+    required this.createdAt,
+    required this.updatedAt,
   });
-
-  static String hashPassword(String password) {
-    var bytes = utf8.encode(password);
-    var digest = sha256.convert(bytes);
-    return digest.toString();
-  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -41,48 +35,35 @@ class User {
       'dateOfBirth': dateOfBirth,
       'email': email,
       'password': password,
-      'paymentMethod': paymentMethod,
-      'contractDuration': contractDuration,
       'accountType': accountType,
       'imageUrl': imageUrl,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
     };
   }
 
-  User copyWithPassword({
-    required String password,
-  }) {
+  static User fromMap(Map<String, Object?> map) {
     return User(
-      id: id,
-      username: username,
-      fullName: fullName,
-      dateOfBirth: dateOfBirth,
-      email: email,
-      password: password,
-      paymentMethod: paymentMethod,
-      contractDuration: contractDuration,
-      accountType: accountType,
-      imageUrl: imageUrl,
+      id: map['id'] as int?,
+      username: map['username'] as String,
+      fullName: map['fullName'] as String,
+      dateOfBirth: map['dateOfBirth'] as String,
+      email: map['email'] as String,
+      password: map['password'] as String,
+      accountType: map['accountType'] as String,
+      imageUrl: map['imageUrl'] as String?,
+      createdAt: DateTime.parse(map['createdAt'] as String),
+      updatedAt: DateTime.parse(map['updatedAt'] as String), 
     );
   }
 
-  copyWithUserImage({
-    String? imageUrl
-  }) {
-    return User(
-      id: id,
-      username: username,
-      fullName: fullName,
-      dateOfBirth: dateOfBirth,
-      email: email,
-      password: password,
-      paymentMethod: paymentMethod,
-      contractDuration: contractDuration,
-      accountType: accountType,
-      imageUrl: imageUrl,
-    );
+  static String hashPassword(String password) {
+    var bytes = utf8.encode(password);
+    var digest = sha256.convert(bytes);
+    return digest.toString();
   }
 
-  copyWithPaymentMethod({required String paymentMethod}) {
+  copyWithUserName({required String fullName}) {
     return User(
       id: id,
       username: username,
@@ -90,10 +71,10 @@ class User {
       dateOfBirth: dateOfBirth,
       email: email,
       password: password,
-      paymentMethod: paymentMethod,
-      contractDuration: contractDuration,
       accountType: accountType,
       imageUrl: imageUrl,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
@@ -105,14 +86,14 @@ class User {
       dateOfBirth: dateOfBirth,
       email: email,
       password: password,
-      paymentMethod: paymentMethod,
-      contractDuration: contractDuration,
       accountType: accountType,
       imageUrl: imageUrl,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
-  copyWithUserName({required String fullName}) {
+  copyWithUserImage({String? imageUrl}) {
     return User(
       id: id,
       username: username,
@@ -120,29 +101,14 @@ class User {
       dateOfBirth: dateOfBirth,
       email: email,
       password: password,
-      paymentMethod: paymentMethod,
-      contractDuration: contractDuration,
       accountType: accountType,
       imageUrl: imageUrl,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 
-  static fromMap(Map<String, Object?> map) {
-    return User(
-      id: map['id'] as int?,
-      username: map['username'] as String,
-      fullName: map['fullName'] as String,
-      dateOfBirth: map['dateOfBirth'] as String,
-      email: map['email'] as String,
-      password: map['password'] as String,
-      paymentMethod: map['paymentMethod'] as String,
-      contractDuration: map['contractDuration'] as int,
-      accountType: map['accountType'] as String,
-      imageUrl: map['imageUrl'] as String?,
-    );
-  }
-
-  copyWithAccountType(String accType) {
+  copyWithPassword({required String password}) {
     return User(
       id: id,
       username: username,
@@ -150,10 +116,40 @@ class User {
       dateOfBirth: dateOfBirth,
       email: email,
       password: password,
-      paymentMethod: paymentMethod,
-      contractDuration: contractDuration,
-      accountType: accType,
+      accountType: accountType,
       imageUrl: imageUrl,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  copyWithAccountType(String accountType) {
+    return User(
+      id: id,
+      username: username,
+      fullName: fullName,
+      dateOfBirth: dateOfBirth,
+      email: email,
+      password: password,
+      accountType: accountType,
+      imageUrl: imageUrl,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+    );
+  }
+
+  copyWithUpdatedAt(DateTime updatedAt) {
+    return User(
+      id: id,
+      username: username,
+      fullName: fullName,
+      dateOfBirth: dateOfBirth,
+      email: email,
+      password: password,
+      accountType: accountType,
+      imageUrl: imageUrl,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
 }
