@@ -19,6 +19,13 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     on<LogoutRequested>(_onLogoutRequested);
   }
 
+  User? getAuthenticatedUser() {
+    if (state is AuthenticationSuccess) {
+      return (state as AuthenticationSuccess).user;
+    }
+    return null;
+  }
+
   Future<void> _onLoginRequested(
     LoginRequested event,
     Emitter<AuthenticationState> emit,

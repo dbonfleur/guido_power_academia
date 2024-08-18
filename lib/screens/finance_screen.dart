@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guido_power_academia/blocs/theme/theme_state.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '../blocs/authentication/authentication_bloc.dart';
 import '../blocs/theme/theme_bloc.dart';
 import '../blocs/user/user_bloc.dart';
 import '../blocs/contract/contract_bloc.dart';
@@ -24,41 +25,61 @@ class _FinanceScreenState extends State<FinanceScreen> {
   @override
   void initState() {
     super.initState();
-    // Carrega o contrato válido automaticamente ao abrir a tela
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final userBloc = context.read<UserBloc>();
-      if (userBloc.state is UserLoaded) {
-        final user = (userBloc.state as UserLoaded).user;
-        context.read<ContractBloc>().add(LoadContractsByUser(userId: user.id!));
-      }
+      _loadAuthenticatedUser(context);
     });
+  }
+
+  Future<void> _loadAuthenticatedUser(BuildContext context) async {
+    final authBloc = context.read<AuthenticationBloc>();
+    final userBloc = context.read<UserBloc>();
+
+    final authState = authBloc.state;
+    if (authState is AuthenticationSuccess) {
+      final authenticatedUser = authState.user;
+      if (userBloc.state is! UserLoaded) {
+        userBloc.add(LoadUser(authenticatedUser.id!));
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final userBloc = context.watch<UserBloc>();
-    final userState = userBloc.state;
-
-    if (userState is UserLoaded) {
-      final user = userState.user;
-      return Scaffold(
-        body: Column(
-          children: [
-            if (user.accountType == 'aluno') ...[
-              Expanded(
-                child: _buildStudentView(context, user.id!),
+    return BlocListener<UserBloc, UserState>(
+      listener: (context, state) {
+        if (state is UserLoaded) {
+          final user = state.user;
+          context.read<ContractBloc>().add(LoadContractsByUser(userId: user.id!));
+        }
+      },
+      child: BlocBuilder<UserBloc, UserState>(
+        builder: (context, state) {
+          if (state is UserLoaded) {
+            final user = state.user;
+            return Scaffold(
+              body: Column(
+                children: [
+                  if (user.accountType == 'aluno') ...[
+                    Expanded(
+                      child: _buildStudentView(context, user.id!),
+                    ),
+                  ] else ...[
+                    Expanded(
+                      child: _buildAdminOrTrainerView(context),
+                    ),
+                  ],
+                ],
               ),
-            ] else ...[
-              Expanded(
-                child: _buildAdminOrTrainerView(context),
-              ),
-            ],
-          ],
-        ),
-      );
-    } else {
-      return const Center(child: CircularProgressIndicator());
-    }
+            );
+          } else if (state is UserInitial || state is UserLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else {
+            return const Center(child: Text('Erro ao carregar usuário.'));
+          }
+        },
+      ),
+    );
   }
 
   Widget _buildStudentView(BuildContext context, int userId) {

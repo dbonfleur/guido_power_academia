@@ -41,26 +41,27 @@ class MuralScreen extends StatelessWidget {
   }
 
   Widget _buildFloatingActionButton(BuildContext context) {
-    final userState = context.read<UserBloc>().state;
-
-    if (userState is UserLoaded) {
-      final user = userState.user;
-      if (user.accountType == 'treinador' || user.accountType == 'admin') {
-        return BlocBuilder<ThemeBloc, ThemeState>(
-          builder: (context, state) {
-            return FloatingActionButton(
-              onPressed: () => const MuralActions().showAddMuralDialog(context),
-              backgroundColor: state.themeData.appBarTheme.backgroundColor,
-              child: Icon(
-                Icons.add,
-                color: state.themeData.iconTheme.color,
-              ),
+    return BlocBuilder<UserBloc, UserState>(
+      builder: (context, userState) {
+        if (userState is UserLoaded) {
+          final user = userState.user;
+          if (user.accountType == 'treinador' || user.accountType == 'admin') {
+            return BlocBuilder<ThemeBloc, ThemeState>(
+              builder: (context, themeState) {
+                return FloatingActionButton(
+                  onPressed: () => const MuralActions().showAddMuralDialog(context),
+                  backgroundColor: themeState.themeData.appBarTheme.backgroundColor,
+                  child: Icon(
+                    Icons.add,
+                    color: themeState.themeData.iconTheme.color,
+                  ),
+                );
+              },
             );
-          },
-        );
-      }
-    }
-
-    return Container();
+          }
+        }
+        return Container();
+      },
+    );
   }
 }

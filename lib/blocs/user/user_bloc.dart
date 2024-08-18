@@ -39,7 +39,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     try {
       final user = await userRepository.getUserById(event.userId);
       if (user != null) {
-        emit(UserLoaded(user));
+        userLoaded(emit, user);
       } else {
         emit(const UserError('Usuário não encontrado'));
       }
@@ -48,13 +48,17 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     }
   }
 
+  void userLoaded(Emitter<UserState> emit, User user) {
+    emit(UserLoaded(user));
+  }
+
   Future<void> _onUpdateUserName(UpdateUserName event, Emitter<UserState> emit) async {
     if (state is UserLoaded) {
       final updatedUser = (state as UserLoaded).user
           .copyWithUserName(fullName: event.fullName)
           .copyWithUpdatedAt(DateTime.now());
       await userRepository.updateUser(updatedUser);
-      emit(UserLoaded(updatedUser));
+      userLoaded(emit, updatedUser);
     }
   }
 
@@ -64,7 +68,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           .copyWithDateOfBirth(dateOfBirth: event.dateOfBirth)
           .copyWithUpdatedAt(DateTime.now());
       await userRepository.updateUser(updatedUser);
-      emit(UserLoaded(updatedUser));
+      userLoaded(emit, updatedUser);
     }
   }
 
@@ -75,7 +79,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
           .copyWithUserImage(imageUrl: event.imageUrl)
           .copyWithUpdatedAt(DateTime.now());
       await userRepository.updateUser(updatedUser);
-      emit(UserLoaded(updatedUser));
+      userLoaded(emit, updatedUser);
     }
   }
 
@@ -89,7 +93,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
             .copyWithPassword(password: User.hashPassword(event.newPassword))
             .copyWithUpdatedAt(DateTime.now());
         await userRepository.updateUser(updatedUser);
-        emit(UserLoaded(updatedUser));
+        userLoaded(emit, updatedUser);
       } else {
         emit(const UserError('Senha antiga não confere'));
       }
