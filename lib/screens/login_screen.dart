@@ -89,8 +89,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    foregroundColor: Theme.of(context).buttonTheme.colorScheme?.onPrimary, 
-                    backgroundColor: Theme.of(context).buttonTheme.colorScheme?.primary, 
+                    foregroundColor: Colors.white, 
+                    backgroundColor:  Colors.deepPurple,
                   ),
                   child: const Text('Login'),
                 );

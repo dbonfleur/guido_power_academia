@@ -98,7 +98,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
           if (contracts.isEmpty) {
             return const Center(child: Text('Nenhum contrato encontrado.'));
           }
-          _selectedContract ??= contracts.firstWhere((contract) => !contract.isCompleted, orElse: () => contracts.first);
+          _selectedContract ??= contracts.lastWhere((contract) => !contract.isCompleted, orElse: () => contracts.last);
           context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: _selectedContract!.id!, context: context));
           return _buildContractSelection(context, contracts);
         } else {
@@ -141,7 +141,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                   onChanged: (User? newValue) {
                     setState(() {
                       _selectedUser = newValue;
-                      _selectedContract = null; // Resetar contrato selecionado ao selecionar novo usuário
+                      _selectedContract = null;
                     });
                     if (_selectedUser != null) {
                       context.read<ContractBloc>().add(LoadContractsByUser(userId: _selectedUser!.id!));
@@ -167,13 +167,14 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     itemCount: contracts.length,
                     itemBuilder: (context, index) {
                       final contract = contracts[index];
+                      context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: contract.id!, context: context));
                       return Card(
                         child: ExpansionTile(
                           title: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text('Contrato ${contract.id}'),
-                              _buildContractStatusBanner(contract.isCompleted),
+                              _buildContractStatusBanner(contract.isCompleted, contract.isValid),
                             ],
                           ),
                           subtitle: Text('Duração: ${contract.contractDurationMonths} meses\nValor total: R\$${contract.contractDurationMonths * 150}'),
@@ -194,11 +195,19 @@ class _FinanceScreenState extends State<FinanceScreen> {
 
   List<Widget> _buildPaymentListForAdmin(BuildContext context, int contractId) {
     context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: contractId, context: context));
+
     return [
       BlocBuilder<PaymentBloc, PaymentState>(
         builder: (context, paymentState) {
           if (paymentState is PaymentsLoaded) {
             final payments = paymentState.payments.where((payment) => payment.contractId == contractId).toList();
+
+            if (payments.isEmpty) {
+              return const ListTile(
+                title: Text('Nenhuma parcela encontrada.'),
+              );
+            }
+
             return Column(
               children: payments.map((payment) {
                 return ListTile(
@@ -227,7 +236,10 @@ class _FinanceScreenState extends State<FinanceScreen> {
                             ),
                           ],
                         )
-                      : const Text('Pendente', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12.0)),
+                      : const Text(
+                          'Pendente',
+                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12.0),
+                        ),
                 );
               }).toList(),
             );
@@ -267,7 +279,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Contrato ${contract.id} '),
-                    _buildContractStatusBanner(contract.isCompleted),
+                    _buildContractStatusBanner(contract.isCompleted, contract.isValid),
                   ],
                 ),
               );
@@ -304,6 +316,8 @@ class _FinanceScreenState extends State<FinanceScreen> {
     final bool isExpanded = _expandedStates[payment.id!] ?? false;
     final String selectedPaymentMethod = _selectedPaymentMethods[payment.id!] ?? payment.paymentMethod;
 
+    final bool isContractValid = _selectedContract?.isValid ?? true;
+
     return Card(
       child: Column(
         children: [
@@ -333,14 +347,16 @@ class _FinanceScreenState extends State<FinanceScreen> {
                       ),
                     ],
                   )
-                : IconButton(
-                    icon: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
-                    onPressed: () {
-                      setState(() {
-                        _expandedStates[payment.id!] = !isExpanded;
-                      });
-                    },
-                  ),
+                : isContractValid
+                    ? IconButton(
+                        icon: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
+                        onPressed: () {
+                          setState(() {
+                            _expandedStates[payment.id!] = !isExpanded;
+                          });
+                        },
+                      )
+                    : null,
           ),
           if (!payment.wasPaid && isExpanded) _buildPaymentDetails(context, payment, selectedPaymentMethod),
         ],
@@ -348,17 +364,35 @@ class _FinanceScreenState extends State<FinanceScreen> {
     );
   }
 
-  Widget _buildContractStatusBanner(bool isCompleted) {
+  Widget _buildContractStatusBanner(bool isCompleted, bool isValid) {
+    String statusText;
+    Color borderColor;
+    Color textColor;
+
+    if (!isValid) {
+      statusText = 'Cancelado';
+      borderColor = Colors.red;
+      textColor = Colors.red;
+    } else if (isCompleted) {
+      statusText = 'Concluído';
+      borderColor = Colors.green;
+      textColor = Colors.green;
+    } else {
+      statusText = 'Em andamento';
+      borderColor = Colors.blue;
+      textColor = Colors.blue;
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
       decoration: BoxDecoration(
-        border: Border.all(color: isCompleted ? Colors.green : Colors.blue),
+        border: Border.all(color: borderColor),
         borderRadius: BorderRadius.circular(12.0),
         color: Colors.transparent,
       ),
       child: Text(
-        isCompleted ? 'Concluído' : 'Em andamento',
-        style: TextStyle(color: isCompleted ? Colors.green : Colors.blue, fontSize: 10),
+        statusText,
+        style: TextStyle(color: textColor, fontSize: 10),
       ),
     );
   }

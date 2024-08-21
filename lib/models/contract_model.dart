@@ -60,7 +60,18 @@ class Contract {
     );
   }
 
-  Contract copyWithContract({required bool isCompleted}) {
+  Contract copyWithCompleted({required bool isCompleted}) {
+    return Contract(
+      id: id,
+      userId: userId,
+      contractDurationMonths: contractDurationMonths,
+      createdAt: createdAt,
+      isValid: isValid,
+      isCompleted: isCompleted,
+    );
+  }
+
+  Contract copyWithIsValid({required bool isValid}) {
     return Contract(
       id: id,
       userId: userId,

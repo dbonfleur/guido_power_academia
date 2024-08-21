@@ -33,3 +33,14 @@ class MarkContractAsCompleted extends ContractEvent {
   @override
   List<Object?> get props => [contractId];
 }
+
+class MarkContractInvalidOrValid extends ContractEvent {
+  final int contractId;
+  final bool isValid;
+
+  const MarkContractInvalidOrValid({required this.contractId, required this.isValid});
+
+  @override
+  List<Object?> get props => [contractId, isValid];
+}
+
