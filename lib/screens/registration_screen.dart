@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import '../blocs/registration/registration_bloc.dart';
+import '../blocs/theme/theme_bloc.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -70,8 +71,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        backgroundColor: BlocProvider.of<ThemeBloc>(context).state.themeData.primaryColor,
+        
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -83,7 +84,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   CircleAvatar(
                     radius: 50,
                     backgroundImage: _imageFile != null ? FileImage(_imageFile!) : null,
-                    backgroundColor: _imageFile == null ? Theme.of(context).colorScheme.primary : null,
+                    backgroundColor: _imageFile == null ? BlocProvider.of<ThemeBloc>(context).state.themeData.primaryColor : null,
                     child: _imageFile == null
                         ? const Icon(Icons.person, size: 50, color: Colors.white)
                         : null,
@@ -138,7 +139,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 labelText: 'Nome de Usuário',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               ),
-              cursorColor: Colors.purple,
+              cursorColor: BlocProvider.of<ThemeBloc>(context).state.themeData.primaryColor,
             ),
             const SizedBox(height: 10),
             TextField(
@@ -147,7 +148,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 labelText: 'Nome Completo',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               ),
-              cursorColor: Colors.purple,
+              cursorColor: BlocProvider.of<ThemeBloc>(context).state.themeData.primaryColor,
             ),
             const SizedBox(height: 10),
             Row(
@@ -167,7 +168,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         _selectedDay = value;
                       });
                     },
-                    iconEnabledColor: Colors.purple,
+                    iconEnabledColor: BlocProvider.of<ThemeBloc>(context).state.themeData.primaryColor,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -186,7 +187,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         _selectedMonth = value;
                       });
                     },
-                    iconEnabledColor: Colors.purple,
+                    iconEnabledColor: BlocProvider.of<ThemeBloc>(context).state.themeData.primaryColor,
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -205,7 +206,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         _selectedYear = value;
                       });
                     },
-                    iconEnabledColor: Colors.purple,
+                    iconEnabledColor: BlocProvider.of<ThemeBloc>(context).state.themeData.primaryColor,
                   ),
                 ),
               ],
@@ -227,7 +228,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 labelText: 'Senha',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
               ),
-              cursorColor: Colors.purple,
+              cursorColor: BlocProvider.of<ThemeBloc>(context).state.themeData.primaryColor,
             ),
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
@@ -244,7 +245,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   _selectedPaymentMethod = value;
                 });
               },
-              iconEnabledColor: Colors.purple,
+              iconEnabledColor: BlocProvider.of<ThemeBloc>(context).state.themeData.primaryColor,
             ),
             const SizedBox(height: 14),
             Row(
@@ -257,7 +258,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       labelText: 'Duração do Contrato (meses)',
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
                     ),
-                    cursorColor: Colors.purple,
+                    readOnly: true,
                   ),
                 ),
                 IconButton(
@@ -270,6 +271,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       });
                     }
                   },
+                  color: BlocProvider.of<ThemeBloc>(context).state.isLightTheme ? 
+                    const Color.fromARGB(255, 52, 52, 52) : 
+                    Colors.white,
                 ),
                 IconButton(
                   icon: const Icon(Icons.remove),
@@ -281,6 +285,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                       });
                     }
                   },
+                  color: BlocProvider.of<ThemeBloc>(context).state.isLightTheme ? 
+                    const Color.fromARGB(255, 52, 52, 52) : 
+                    Colors.white,
                 ),
               ],
             ),
@@ -297,7 +304,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               },
               builder: (context, state) {
                 if (state is RegistrationLoading) {
-                  return const CircularProgressIndicator();
+                  return const Center(
+                    child: SizedBox(
+                      width: 30,
+                      height: 30,
+                      child: CircularProgressIndicator(strokeWidth: 2.0),
+                    ),
+                  );
                 }
                 return ElevatedButton(
                   onPressed: () {
@@ -328,8 +341,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15)
                     ),
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary, 
-                    backgroundColor: Theme.of(context).colorScheme.primary, 
+                    backgroundColor: BlocProvider.of<ThemeBloc>(context).state.themeData.primaryColor
                   ),
                   child: const Text('Registrar'),
                 );

@@ -61,6 +61,7 @@ class RegistrationBloc extends Bloc<RegistrationEvent, RegistrationState> {
             contractDurationMonths: event.contractDuration,
             createdAt: DateTime.now(),
             isValid: true,
+            isCompleted: false,
           );
 
           contractBloc.add(CreateContract(contract: contract));

@@ -18,8 +18,9 @@ class CreatePayment extends PaymentEvent {
 
 class LoadPaymentsByContract extends PaymentEvent {
   final int contractId;
+  final BuildContext context;
 
-  const LoadPaymentsByContract({required this.contractId});
+  const LoadPaymentsByContract({required this.contractId, required this.context});
 
   @override
   List<Object?> get props => [contractId];
@@ -37,8 +38,9 @@ class UpdatePaymentMethod extends PaymentEvent {
 
 class MarkPaymentAsPaid extends PaymentEvent {
   final int paymentId;
+  final BuildContext context;
 
-  const MarkPaymentAsPaid({required this.paymentId});
+  const MarkPaymentAsPaid({required this.paymentId, required this.context});
 
   @override
   List<Object?> get props => [paymentId];

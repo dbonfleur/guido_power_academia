@@ -7,8 +7,12 @@ import '../blocs/theme/theme_bloc.dart';
 import '../blocs/user/user_bloc.dart';
 import '../blocs/contract/contract_bloc.dart';
 import '../blocs/payment/payment_bloc.dart';
+import '../blocs/search/search_bloc.dart';
+import '../blocs/search/search_state.dart';
 import '../models/contract_model.dart';
 import '../models/payment_model.dart';
+import '../models/user_model.dart';
+import 'dart:convert';
 
 class FinanceScreen extends StatefulWidget {
   const FinanceScreen({super.key});
@@ -19,6 +23,7 @@ class FinanceScreen extends StatefulWidget {
 
 class _FinanceScreenState extends State<FinanceScreen> {
   Contract? _selectedContract;
+  User? _selectedUser;
   final Map<int, bool> _expandedStates = {};
   final Map<int, String?> _selectedPaymentMethods = {};
 
@@ -50,7 +55,10 @@ class _FinanceScreenState extends State<FinanceScreen> {
       listener: (context, state) {
         if (state is UserLoaded) {
           final user = state.user;
-          context.read<ContractBloc>().add(LoadContractsByUser(userId: user.id!));
+          _selectedContract = null; // Resetar contrato selecionado ao carregar novo usuário
+          if (user.accountType == 'aluno') {
+            context.read<ContractBloc>().add(LoadContractsByUser(userId: user.id!));
+          }
         }
       },
       child: BlocBuilder<UserBloc, UserState>(
@@ -64,7 +72,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     Expanded(
                       child: _buildStudentView(context, user.id!),
                     ),
-                  ] else ...[
+                  ] else if (user.accountType == 'treinador' || user.accountType == 'admin') ...[
                     Expanded(
                       child: _buildAdminOrTrainerView(context),
                     ),
@@ -90,14 +98,145 @@ class _FinanceScreenState extends State<FinanceScreen> {
           if (contracts.isEmpty) {
             return const Center(child: Text('Nenhum contrato encontrado.'));
           }
-          _selectedContract ??= contracts.firstWhere((contract) => contract.isValid, orElse: () => contracts.first);
-          context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: _selectedContract!.id!));
+          _selectedContract ??= contracts.firstWhere((contract) => !contract.isCompleted, orElse: () => contracts.first);
+          context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: _selectedContract!.id!, context: context));
           return _buildContractSelection(context, contracts);
         } else {
           return const Center(child: CircularProgressIndicator());
         }
       },
     );
+  }
+
+  Widget _buildAdminOrTrainerView(BuildContext context) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: BlocBuilder<SearchBloc, SearchState>(
+            builder: (context, state) {
+              if (state is SearchUsersLoaded) {
+                return DropdownButtonFormField<User>(
+                  decoration: InputDecoration(
+                    labelText: 'Selecione um aluno',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  items: state.users.map<DropdownMenuItem<User>>((user) {
+                    return DropdownMenuItem<User>(
+                      value: user,
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: MemoryImage(base64Decode(user.imageUrl)),
+                            radius: 20,
+                          ),
+                          const SizedBox(width: 10),
+                          Text('${user.fullName} (${user.email})'),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                  onChanged: (User? newValue) {
+                    setState(() {
+                      _selectedUser = newValue;
+                      _selectedContract = null; // Resetar contrato selecionado ao selecionar novo usuário
+                    });
+                    if (_selectedUser != null) {
+                      context.read<ContractBloc>().add(LoadContractsByUser(userId: _selectedUser!.id!));
+                    }
+                  },
+                );
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          ),
+        ),
+        if (_selectedUser != null)
+          Expanded(
+            child: BlocBuilder<ContractBloc, ContractState>(
+              builder: (context, state) {
+                if (state is ContractsLoaded) {
+                  final contracts = state.contracts;
+                  if (contracts.isEmpty) {
+                    return const Center(child: Text('Nenhum contrato encontrado.'));
+                  }
+                  return ListView.builder(
+                    itemCount: contracts.length,
+                    itemBuilder: (context, index) {
+                      final contract = contracts[index];
+                      return Card(
+                        child: ExpansionTile(
+                          title: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Contrato ${contract.id}'),
+                              _buildContractStatusBanner(contract.isCompleted),
+                            ],
+                          ),
+                          subtitle: Text('Duração: ${contract.contractDurationMonths} meses\nValor total: R\$${contract.contractDurationMonths * 150}'),
+                          children: _buildPaymentListForAdmin(context, contract.id!),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  List<Widget> _buildPaymentListForAdmin(BuildContext context, int contractId) {
+    context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: contractId, context: context));
+    return [
+      BlocBuilder<PaymentBloc, PaymentState>(
+        builder: (context, paymentState) {
+          if (paymentState is PaymentsLoaded) {
+            final payments = paymentState.payments.where((payment) => payment.contractId == contractId).toList();
+            return Column(
+              children: payments.map((payment) {
+                return ListTile(
+                  title: Text('Parcela ${payment.numberOfParcel}'),
+                  subtitle: Text('Valor: R\$${payment.value}\nVencimento: ${_formatDate(payment.dueDate)}'),
+                  trailing: payment.wasPaid
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.green),
+                                borderRadius: BorderRadius.circular(12.0),
+                                color: Colors.transparent,
+                              ),
+                              child: Text(
+                                'Pago em ${_formatDateTime(payment.updatedAt)}',
+                                style: const TextStyle(color: Colors.green),
+                              ),
+                            ),
+                            const SizedBox(height: 4.0),
+                            Text(
+                              'Método: ${payment.paymentMethod}',
+                              style: const TextStyle(color: Colors.green, fontSize: 12.0),
+                            ),
+                          ],
+                        )
+                      : const Text('Pendente', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12.0)),
+                );
+              }).toList(),
+            );
+          } else {
+            return const Center(child: CircularProgressIndicator());
+          }
+        },
+      ),
+    ];
   }
 
   Widget _buildContractSelection(BuildContext context, List<Contract> contracts) {
@@ -118,13 +257,19 @@ class _FinanceScreenState extends State<FinanceScreen> {
                 _selectedContract = newValue;
               });
               if (_selectedContract != null) {
-                context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: _selectedContract!.id!));
+                context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: _selectedContract!.id!, context: context));
               }
             },
             items: contracts.map<DropdownMenuItem<Contract>>((Contract contract) {
               return DropdownMenuItem<Contract>(
                 value: contract,
-                child: Text('Contrato ${contract.id}'),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Contrato ${contract.id} '),
+                    _buildContractStatusBanner(contract.isCompleted),
+                  ],
+                ),
               );
             }).toList(),
           ),
@@ -165,7 +310,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
           ListTile(
             title: Text('Parcela ${payment.numberOfParcel}'),
             subtitle: Text('Valor: R\$${payment.value}\nVencimento: ${_formatDate(payment.dueDate)}'),
-            trailing: payment.wasPaid 
+            trailing: payment.wasPaid
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -197,9 +342,23 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     },
                   ),
           ),
-          if (!payment.wasPaid && isExpanded) 
-            _buildPaymentDetails(context, payment, selectedPaymentMethod),
+          if (!payment.wasPaid && isExpanded) _buildPaymentDetails(context, payment, selectedPaymentMethod),
         ],
+      ),
+    );
+  }
+
+  Widget _buildContractStatusBanner(bool isCompleted) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+      decoration: BoxDecoration(
+        border: Border.all(color: isCompleted ? Colors.green : Colors.blue),
+        borderRadius: BorderRadius.circular(12.0),
+        color: Colors.transparent,
+      ),
+      child: Text(
+        isCompleted ? 'Concluído' : 'Em andamento',
+        style: TextStyle(color: isCompleted ? Colors.green : Colors.blue, fontSize: 10),
       ),
     );
   }
@@ -272,12 +431,11 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     ),
                   ],
                 ),
-              if (selectedPaymentMethod == 'Dinheiro')
-                const Text('Por favor, pague com um treinador.'),
+              if (selectedPaymentMethod == 'Dinheiro') const Text('Por favor, pague com um treinador.'),
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {
-                  context.read<PaymentBloc>().add(MarkPaymentAsPaid(paymentId: payment.id!));
+                  context.read<PaymentBloc>().add(MarkPaymentAsPaid(paymentId: payment.id!, context: context));
                   setState(() {
                     _expandedStates[payment.id!] = false;
                   });
@@ -289,18 +447,12 @@ class _FinanceScreenState extends State<FinanceScreen> {
               ),
             ],
           );
-        }
+        },
       ),
     );
   }
 
   String _formatDate(DateTime date) {
     return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
-  }
-
-  Widget _buildAdminOrTrainerView(BuildContext context) {
-    return const Center(
-      child: Text('Visualizar pagamentos de alunos'),
-    );
   }
 }

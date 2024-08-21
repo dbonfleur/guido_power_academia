@@ -4,6 +4,7 @@ class Contract {
   final int contractDurationMonths;
   final DateTime createdAt;
   final bool isValid;
+  final bool isCompleted;
 
   Contract({
     this.id,
@@ -11,6 +12,7 @@ class Contract {
     required this.contractDurationMonths,
     required this.createdAt,
     required this.isValid,
+    required this.isCompleted,
   });
 
   @override
@@ -22,7 +24,8 @@ class Contract {
         other.userId == userId &&
         other.contractDurationMonths == contractDurationMonths &&
         other.createdAt == createdAt &&
-        other.isValid == isValid;
+        other.isValid == isValid &&
+        other.isCompleted == isCompleted;
   }
 
   @override
@@ -31,7 +34,8 @@ class Contract {
         userId.hashCode ^
         contractDurationMonths.hashCode ^
         createdAt.hashCode ^
-        isValid.hashCode;
+        isValid.hashCode ^
+        isCompleted.hashCode;
   }
 
   Map<String, dynamic> toMap() {
@@ -41,6 +45,7 @@ class Contract {
       'contractDurationMonths': contractDurationMonths,
       'createdAt': createdAt.toIso8601String(),
       'isValid': isValid ? 1 : 0,
+      'isCompleted': isCompleted ? 1 : 0,
     };
   }
 
@@ -51,6 +56,18 @@ class Contract {
       contractDurationMonths: map['contractDurationMonths'] as int,
       createdAt: DateTime.parse(map['createdAt'] as String),
       isValid: map['isValid'] == 1,
+      isCompleted: map['isCompleted'] == 1,
+    );
+  }
+
+  Contract copyWithContract({required bool isCompleted}) {
+    return Contract(
+      id: id,
+      userId: userId,
+      contractDurationMonths: contractDurationMonths,
+      createdAt: createdAt,
+      isValid: isValid,
+      isCompleted: isCompleted,
     );
   }
 }

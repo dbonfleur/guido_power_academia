@@ -24,3 +24,12 @@ class LoadContractsByUser extends ContractEvent {
   @override
   List<Object?> get props => [userId];
 }
+
+class MarkContractAsCompleted extends ContractEvent {
+  final int contractId;
+
+  const MarkContractAsCompleted({required this.contractId});
+
+  @override
+  List<Object?> get props => [contractId];
+}

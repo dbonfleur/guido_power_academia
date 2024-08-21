@@ -33,7 +33,8 @@ class ThemeState {
       primaryColor: Colors.deepPurple,
       appBarTheme: const AppBarTheme(
         color: Colors.deepPurple,
-      )
+      ),
+      
     ), false);
   }
 }

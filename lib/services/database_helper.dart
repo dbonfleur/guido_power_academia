@@ -45,6 +45,7 @@ class DatabaseHelper {
     contractDurationMonths INTEGER NOT NULL,
     createdAt TEXT NOT NULL,
     isValid INTEGER NOT NULL,
+    isCompleted INTEGER NOT NULL,
     FOREIGN KEY (userId) REFERENCES user(id) ON DELETE CASCADE
   )''';
 

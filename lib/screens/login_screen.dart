@@ -57,7 +57,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Text('Manter Conectado'),
               ],
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 35),
             BlocConsumer<AuthenticationBloc, AuthenticationState>(
               listener: (context, state) {
                 if (state is AuthenticationSuccess) {
@@ -89,14 +89,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),
-                    foregroundColor: Theme.of(context).colorScheme.onPrimary, 
-                    backgroundColor: Theme.of(context).colorScheme.primary, 
+                    foregroundColor: Theme.of(context).buttonTheme.colorScheme?.onPrimary, 
+                    backgroundColor: Theme.of(context).buttonTheme.colorScheme?.primary, 
                   ),
                   child: const Text('Login'),
                 );
               },
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             TextButton(
               onPressed: () {
                 Navigator.pushNamed(context, '/register');

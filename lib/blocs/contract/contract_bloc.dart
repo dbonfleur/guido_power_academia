@@ -12,6 +12,7 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
   ContractBloc(this.contractRepository) : super(ContractInitial()) {
     on<CreateContract>(_onCreateContract);
     on<LoadContractsByUser>(_onLoadContractsByUser);
+    on<MarkContractAsCompleted>(_onMarkContractAsCompleted);
   }
 
   Future<void> _onCreateContract(
@@ -33,6 +34,28 @@ class ContractBloc extends Bloc<ContractEvent, ContractState> {
     try {
       final contracts = await contractRepository.getContractsByUser(event.userId);
       emit(ContractsLoaded(contracts: contracts));
+    } catch (e) {
+      emit(ContractError(message: e.toString()));
+    }
+  }
+  
+  Future<void> _onMarkContractAsCompleted(
+    MarkContractAsCompleted event,
+    Emitter<ContractState> emit,
+  ) async {
+    try {
+      final currentState = state;
+      if (currentState is ContractsLoaded) {
+        final updatedContracts = currentState.contracts.map((contract) {
+          if (contract.id == event.contractId) {
+            return contract.copyWithContract(isCompleted: true);
+          }
+          return contract;
+        }).toList();
+
+        await contractRepository.updateContract(updatedContracts.firstWhere((contract) => contract.id == event.contractId));
+        emit(ContractsLoaded(contracts: updatedContracts));
+      }
     } catch (e) {
       emit(ContractError(message: e.toString()));
     }
