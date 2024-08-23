@@ -2,17 +2,19 @@ import 'dart:io';
 import 'package:desktop_window/desktop_window.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guido_power_academia/blocs/contract/contract_bloc.dart';
-import 'package:guido_power_academia/blocs/search/search_bloc.dart';
-import 'package:guido_power_academia/blocs/treino/historico_treino_bloc.dart';
-import 'package:guido_power_academia/blocs/treino/pacote_treino_bloc.dart';
-import 'package:guido_power_academia/blocs/treino/pesos_treino_bloc.dart';
-import 'package:guido_power_academia/blocs/treino/treino_bloc.dart';
-import 'package:guido_power_academia/blocs/treino/user_pacote_treino_bloc.dart';
-import 'package:guido_power_academia/repositories/treino_repository.dart';
 import 'package:nested/nested.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'services/database_helper.dart';
+
+import 'blocs/contract/contract_bloc.dart';
+import 'blocs/search/search_bloc.dart';
+import 'blocs/treino/historico_treino_bloc.dart';
+import 'blocs/treino/pacote_treino_bloc.dart';
+import 'blocs/treino/pesos_treino_bloc.dart';
+import 'blocs/treino/treino_bloc.dart';
+import 'blocs/treino/user_pacote_treino_bloc.dart';
 import 'blocs/authentication/authentication_bloc.dart';
 import 'blocs/mural/mural_event.dart';
 import 'blocs/payment/payment_bloc.dart';
@@ -22,11 +24,13 @@ import 'blocs/theme/theme_state.dart';
 import 'blocs/trainer/trainer_bloc.dart';
 import 'blocs/user/user_bloc.dart';
 import 'blocs/mural/mural_bloc.dart';
+
 import 'repositories/contract_repository.dart';
 import 'repositories/payment_repository.dart';
 import 'repositories/user_repository.dart';
-import 'repositories/message_repository.dart'; 
-import 'services/database_helper.dart';
+import 'repositories/message_repository.dart';
+import 'repositories/treino_repository.dart';
+
 import 'screens/login_screen.dart';
 import 'screens/registration_screen.dart';
 import 'screens/home_screen.dart';
@@ -91,8 +95,8 @@ class MyApp extends StatelessWidget {
             title: 'Guido Power Academia',
             debugShowCheckedModeBanner: false,
             theme: state.themeData,
-            // initialRoute: introSeen ? '/' : '/intro',
-            initialRoute: '/intro',
+            initialRoute: introSeen ? '/' : '/intro',
+            // initialRoute: '/intro',
             routes: {
               '/': (context) => const LoginScreen(),
               '/register': (context) => const RegistrationScreen(),

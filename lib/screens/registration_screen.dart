@@ -62,6 +62,37 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     });
   }
 
+  bool _validateFields() {
+    final username = _usernameController.text;
+    final fullName = _fullNameController.text;
+    final email = _emailController.text;
+    final password = _passwordController.text;
+    final paymentMethod = _selectedPaymentMethod;
+
+    if (username.isEmpty || fullName.isEmpty || email.isEmpty || password.isEmpty || paymentMethod == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Todos os campos obrigatórios devem ser preenchidos.')),
+      );
+      return false;
+    }
+
+    if (!email.contains('@') || !email.endsWith('.com')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('O email deve conter "@" e terminar com ".com".')),
+      );
+      return false;
+    }
+
+    if (password.length < 8) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('A senha deve ter pelo menos 8 caracteres.')),
+      );
+      return false;
+    }
+
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -314,28 +345,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 }
                 return ElevatedButton(
                   onPressed: () {
-                    final username = _usernameController.text;
-                    final fullName = _fullNameController.text;
-                    final dateOfBirth = '$_selectedDay/${monthNames[_selectedMonth]}/$_selectedYear';
-                    final email = _emailController.text;
-                    final password = _passwordController.text;
-                    final paymentMethod = _selectedPaymentMethod;
-                    final contractDuration = int.parse(_contractDurationController.text);
+                    if (_validateFields()) {
+                      final username = _usernameController.text;
+                      final fullName = _fullNameController.text;
+                      final dateOfBirth = '$_selectedDay/${monthNames[_selectedMonth]}/$_selectedYear';
+                      final email = _emailController.text;
+                      final password = _passwordController.text;
+                      final paymentMethod = _selectedPaymentMethod;
+                      final contractDuration = int.parse(_contractDurationController.text);
 
-                    BlocProvider.of<RegistrationBloc>(context).add(
-                      RegisterUser(
-                        username: username,
-                        fullName: fullName,
-                        dateOfBirth: dateOfBirth,
-                        email: email,
-                        password: password,
-                        paymentMethod: paymentMethod!,
-                        contractDuration: contractDuration,
-                        accountType: 'aluno',
-                        imageUrl: _imageFile?.path,
-                        context: context,
-                      ),
-                    );
+                      BlocProvider.of<RegistrationBloc>(context).add(
+                        RegisterUser(
+                          username: username,
+                          fullName: fullName,
+                          dateOfBirth: dateOfBirth,
+                          email: email,
+                          password: password,
+                          paymentMethod: paymentMethod!,
+                          contractDuration: contractDuration,
+                          accountType: 'aluno',
+                          imageUrl: _imageFile?.path,
+                          context: context,
+                        ),
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(

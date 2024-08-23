@@ -30,7 +30,6 @@ class _FinanceScreenState extends State<FinanceScreen> {
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadAuthenticatedUser(context);
     });
@@ -55,7 +54,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
       listener: (context, state) {
         if (state is UserLoaded) {
           final user = state.user;
-          _selectedContract = null; // Resetar contrato selecionado ao carregar novo usuário
+          _selectedContract = null;
           if (user.accountType == 'aluno') {
             context.read<ContractBloc>().add(LoadContractsByUser(userId: user.id!));
           }
@@ -72,7 +71,8 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     Expanded(
                       child: _buildStudentView(context, user.id!),
                     ),
-                  ] else if (user.accountType == 'treinador' || user.accountType == 'admin') ...[
+                  ] else if (user.accountType == 'treinador' ||
+                      user.accountType == 'admin') ...[
                     Expanded(
                       child: _buildAdminOrTrainerView(context),
                     ),
@@ -98,8 +98,20 @@ class _FinanceScreenState extends State<FinanceScreen> {
           if (contracts.isEmpty) {
             return const Center(child: Text('Nenhum contrato encontrado.'));
           }
-          _selectedContract ??= contracts.lastWhere((contract) => !contract.isCompleted, orElse: () => contracts.last);
-          context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: _selectedContract!.id!, context: context));
+
+          _selectedContract ??= contracts.lastWhere(
+              (contract) => !contract.isCompleted,
+              orElse: () => Contract(
+                  userId: -1,
+                  contractDurationMonths: 0,
+                  createdAt: DateTime.now(),
+                  isValid: false,
+                  isCompleted: true));
+
+          if (_selectedContract!.userId != -1) {
+            context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: _selectedContract!.id!, context: context));
+          }
+
           return _buildContractSelection(context, contracts);
         } else {
           return const Center(child: CircularProgressIndicator());
@@ -177,12 +189,81 @@ class _FinanceScreenState extends State<FinanceScreen> {
                               _buildContractStatusBanner(contract.isCompleted, contract.isValid),
                             ],
                           ),
-                          subtitle: Text('Duração: ${contract.contractDurationMonths} meses\nValor total: R\$${contract.contractDurationMonths * 150}'),
+                          subtitle: Text(
+                              'Duração: ${contract.contractDurationMonths} meses\nValor total: R\$${contract.contractDurationMonths * 150}'),
                           children: _buildPaymentListForAdmin(context, contract.id!),
                         ),
                       );
                     },
                   );
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildContractSelection(BuildContext context, List<Contract> contracts) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: DropdownButtonFormField<Contract>(
+            decoration: InputDecoration(
+              labelText: 'Selecione um contrato',
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            value: contracts.contains(_selectedContract) ? _selectedContract : null,
+            onChanged: (Contract? newValue) {
+              setState(() {
+                _selectedContract = newValue;
+              });
+              if (_selectedContract != null && _selectedContract!.id != -1) {
+                context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: _selectedContract!.id!, context: context));
+              }
+            },
+            items: contracts.map<DropdownMenuItem<Contract>>((Contract contract) {
+              return DropdownMenuItem<Contract>(
+                value: contract,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Contrato ${contract.id}'),
+                    _buildContractStatusBanner(contract.isCompleted, contract.isValid),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        if (_selectedContract == null || _selectedContract!.userId == -1)
+          const Expanded(
+            child: Center(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Text(
+                  'Nenhum contrato ativo. Converse com um treinador para verificar seu contrato.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.redAccent,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        if (_selectedContract != null && _selectedContract!.userId != -1)
+          Expanded(
+            child: BlocBuilder<PaymentBloc, PaymentState>(
+              builder: (context, paymentState) {
+                if (paymentState is PaymentsLoaded) {
+                  return _buildPaymentList(context, paymentState.payments);
                 } else {
                   return const Center(child: CircularProgressIndicator());
                 }
@@ -251,64 +332,13 @@ class _FinanceScreenState extends State<FinanceScreen> {
     ];
   }
 
-  Widget _buildContractSelection(BuildContext context, List<Contract> contracts) {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: DropdownButtonFormField<Contract>(
-            decoration: InputDecoration(
-              labelText: 'Selecione um contrato',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            value: _selectedContract,
-            onChanged: (Contract? newValue) {
-              setState(() {
-                _selectedContract = newValue;
-              });
-              if (_selectedContract != null) {
-                context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: _selectedContract!.id!, context: context));
-              }
-            },
-            items: contracts.map<DropdownMenuItem<Contract>>((Contract contract) {
-              return DropdownMenuItem<Contract>(
-                value: contract,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Contrato ${contract.id} '),
-                    _buildContractStatusBanner(contract.isCompleted, contract.isValid),
-                  ],
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        if (_selectedContract != null)
-          BlocBuilder<PaymentBloc, PaymentState>(
-            builder: (context, paymentState) {
-              if (paymentState is PaymentsLoaded) {
-                return _buildPaymentList(context, paymentState.payments);
-              } else {
-                return const Center(child: CircularProgressIndicator());
-              }
-            },
-          ),
-      ],
-    );
-  }
-
   Widget _buildPaymentList(BuildContext context, List<Payment> payments) {
-    return Expanded(
-      child: ListView.builder(
-        itemCount: payments.length,
-        itemBuilder: (context, index) {
-          final payment = payments[index];
-          return _buildPaymentCard(context, payment);
-        },
-      ),
+    return ListView.builder(
+      itemCount: payments.length,
+      itemBuilder: (context, index) {
+        final payment = payments[index];
+        return _buildPaymentCard(context, payment);
+      },
     );
   }
 
@@ -435,6 +465,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     QrImageView(
                       data: '123e4567-e89b-12d3-a456-426614174000',
                       version: QrVersions.auto,
+                      backgroundColor: Colors.white,
                       size: 150.0,
                     ),
                   ],

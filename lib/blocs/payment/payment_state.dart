@@ -35,5 +35,3 @@ class PaymentError extends PaymentState {
   @override
   List<Object?> get props => [message];
 }
-
-
