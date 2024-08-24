@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
-import '../../models/treino_model.dart';
+
+import '../../models/treino_model/pacote_treino.dart';
+
 
 abstract class PacoteTreinoEvent extends Equatable {
   const PacoteTreinoEvent();

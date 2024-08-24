@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../models/treino_model.dart';
+import '../../models/treino_model/treino.dart';
 
 class MultiSelectWorkoutDropdown extends StatefulWidget {
   final List<Treino> workoutList;

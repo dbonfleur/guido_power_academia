@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../repositories/message_repository.dart';
+import '../../repositories/mural_repository.dart';
 import 'mural_event.dart';
 import 'mural_state.dart';
 

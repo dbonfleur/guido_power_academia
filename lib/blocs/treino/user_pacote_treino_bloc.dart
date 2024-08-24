@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../repositories/treino_repository.dart';
+import '../../repositories/user_pacote_treino_repository.dart';
 import 'user_pacote_treino_event.dart';
 import 'user_pacote_treino_state.dart';
 
 class UserPacoteTreinoBloc extends Bloc<UserPacoteTreinoEvent, UserPacoteTreinoState> {
-  final TreinoRepository treinoRepository;
+  final UserPacoteTreinoRepository userPacoteTreinoRepo;
 
-  UserPacoteTreinoBloc(this.treinoRepository) : super(UserPacoteTreinoInitial()) {
+  UserPacoteTreinoBloc(this.userPacoteTreinoRepo) : super(UserPacoteTreinoInitial()) {
     on<LoadUserPacotesTreino>(_onLoadUserPacotesTreino);
     on<CreateUserPacoteTreino>(_onCreateUserPacoteTreino);
     on<UpdateUserPacoteTreino>(_onUpdateUserPacoteTreino);
@@ -16,7 +16,7 @@ class UserPacoteTreinoBloc extends Bloc<UserPacoteTreinoEvent, UserPacoteTreinoS
   Future<void> _onLoadUserPacotesTreino(LoadUserPacotesTreino event, Emitter<UserPacoteTreinoState> emit) async {
     emit(UserPacoteTreinoLoading());
     try {
-      final userPacotesTreino = await treinoRepository.getAllUserPacotesTreino();
+      final userPacotesTreino = await userPacoteTreinoRepo.getAllUserPacotesTreino();
       emit(UserPacoteTreinoLoaded(userPacotesTreino));
     } catch (e) {
       emit(UserPacoteTreinoError(e.toString()));
@@ -25,7 +25,7 @@ class UserPacoteTreinoBloc extends Bloc<UserPacoteTreinoEvent, UserPacoteTreinoS
 
   Future<void> _onCreateUserPacoteTreino(CreateUserPacoteTreino event, Emitter<UserPacoteTreinoState> emit) async {
     try {
-      await treinoRepository.createUserPacoteTreino(event.userPacoteTreino);
+      await userPacoteTreinoRepo.createUserPacoteTreino(event.userPacoteTreino);
       add(LoadUserPacotesTreino());
     } catch (e) {
       emit(UserPacoteTreinoError(e.toString()));
@@ -34,7 +34,7 @@ class UserPacoteTreinoBloc extends Bloc<UserPacoteTreinoEvent, UserPacoteTreinoS
 
   Future<void> _onUpdateUserPacoteTreino(UpdateUserPacoteTreino event, Emitter<UserPacoteTreinoState> emit) async {
     try {
-      await treinoRepository.updateUserPacoteTreino(event.userPacoteTreino);
+      await userPacoteTreinoRepo.updateUserPacoteTreino(event.userPacoteTreino);
       add(LoadUserPacotesTreino());
     } catch (e) {
       emit(UserPacoteTreinoError(e.toString()));
@@ -43,7 +43,7 @@ class UserPacoteTreinoBloc extends Bloc<UserPacoteTreinoEvent, UserPacoteTreinoS
 
   Future<void> _onDeleteUserPacoteTreino(DeleteUserPacoteTreino event, Emitter<UserPacoteTreinoState> emit) async {
     try {
-      await treinoRepository.deleteUserPacoteTreino(event.id);
+      await userPacoteTreinoRepo.deleteUserPacoteTreino(event.id);
       add(LoadUserPacotesTreino());
     } catch (e) {
       emit(UserPacoteTreinoError(e.toString()));

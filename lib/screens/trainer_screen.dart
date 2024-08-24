@@ -23,7 +23,7 @@ class _TrainerScreenState extends State<TrainerScreen> {
   void initState() {
     super.initState();
     context.read<TrainerBloc>().add(LoadTrainers());
-    context.read<SearchBloc>().add(const LoadUsersByFullName('')); // Carrega todos os usuários inicialmente
+    context.read<SearchBloc>().add(const LoadUsersByFullName(''));
 
     _searchController.addListener(() {
       final query = _searchController.text.trim();

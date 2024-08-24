@@ -71,8 +71,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     Expanded(
                       child: _buildStudentView(context, user.id!),
                     ),
-                  ] else if (user.accountType == 'treinador' ||
-                      user.accountType == 'admin') ...[
+                  ] else if (user.accountType == 'treinador' || user.accountType == 'admin') ...[
                     Expanded(
                       child: _buildAdminOrTrainerView(context),
                     ),
@@ -180,19 +179,29 @@ class _FinanceScreenState extends State<FinanceScreen> {
                     itemBuilder: (context, index) {
                       final contract = contracts[index];
                       context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: contract.id!, context: context));
-                      return Card(
-                        child: ExpansionTile(
-                          title: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Contrato ${contract.id}'),
-                              _buildContractStatusBanner(contract.isCompleted, contract.isValid),
-                            ],
-                          ),
-                          subtitle: Text(
-                              'Duração: ${contract.contractDurationMonths} meses\nValor total: R\$${contract.contractDurationMonths * 150}'),
-                          children: _buildPaymentListForAdmin(context, contract.id!),
-                        ),
+                      return FutureBuilder<List<Widget>>(
+                        future: _buildPaymentListForAdmin(context, contract.id!),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          } else if (snapshot.hasError) {
+                            return const Center(child: Text('Error loading payments.'));
+                          } else {
+                            return Card(
+                              child: ExpansionTile(
+                                title: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text('Contrato ${contract.id}'),
+                                    _buildContractStatusBanner(contract.isCompleted, contract.isValid),
+                                  ],
+                                ),
+                                subtitle: Text('Duração: ${contract.contractDurationMonths} meses\nValor total: R\$${contract.contractDurationMonths * 150}'),
+                                children: snapshot.data!,
+                              ),
+                            );
+                          }
+                        },
                       );
                     },
                   );
@@ -274,63 +283,125 @@ class _FinanceScreenState extends State<FinanceScreen> {
     );
   }
 
-  List<Widget> _buildPaymentListForAdmin(BuildContext context, int contractId) {
-    context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: contractId, context: context));
+  Future<List<Widget>> _buildPaymentListForAdmin(BuildContext context, int contractId) async {
+    final paymentBloc = context.read<PaymentBloc>();
 
-    return [
-      BlocBuilder<PaymentBloc, PaymentState>(
-        builder: (context, paymentState) {
-          if (paymentState is PaymentsLoaded) {
-            final payments = paymentState.payments.where((payment) => payment.contractId == contractId).toList();
+    // Adiciona o evento para carregar os pagamentos do contrato
+    paymentBloc.add(LoadPaymentsByContract(contractId: contractId, context: context));
 
-            if (payments.isEmpty) {
-              return const ListTile(
-                title: Text('Nenhuma parcela encontrada.'),
-              );
-            }
+    // Espera até que o PaymentsLoaded seja emitido
+    await for (final state in paymentBloc.stream) {
+      if (state is PaymentsLoaded && state.payments.isNotEmpty && state.payments.first.contractId == contractId) {
+        final payments = state.payments.where((payment) => payment.contractId == contractId).toList();
 
-            return Column(
-              children: payments.map((payment) {
-                return ListTile(
-                  title: Text('Parcela ${payment.numberOfParcel}'),
-                  subtitle: Text('Valor: R\$${payment.value}\nVencimento: ${_formatDate(payment.dueDate)}'),
-                  trailing: payment.wasPaid
-                      ? Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-                              decoration: BoxDecoration(
-                                border: Border.all(color: Colors.green),
-                                borderRadius: BorderRadius.circular(12.0),
-                                color: Colors.transparent,
-                              ),
-                              child: Text(
-                                'Pago em ${_formatDateTime(payment.updatedAt)}',
-                                style: const TextStyle(color: Colors.green),
-                              ),
-                            ),
-                            const SizedBox(height: 4.0),
-                            Text(
-                              'Método: ${payment.paymentMethod}',
-                              style: const TextStyle(color: Colors.green, fontSize: 12.0),
-                            ),
-                          ],
-                        )
-                      : const Text(
-                          'Pendente',
-                          style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12.0),
+        if (payments.isEmpty) {
+          return [
+            const ListTile(
+              title: Text('Nenhuma parcela encontrada.'),
+            ),
+          ];
+        }
+
+        return payments.map<Widget>((payment) {
+          return ListTile(
+            title: Text('Parcela ${payment.numberOfParcel}'),
+            subtitle: Text('Valor: R\$${payment.value}\nVencimento: ${_formatDate(payment.dueDate)}'),
+            trailing: payment.wasPaid
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.green),
+                          borderRadius: BorderRadius.circular(12.0),
+                          color: Colors.transparent,
                         ),
-                );
-              }).toList(),
-            );
-          } else {
-            return const Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
+                        child: Text(
+                          'Pago em ${_formatDateTime(payment.updatedAt)}',
+                          style: const TextStyle(color: Colors.green),
+                        ),
+                      ),
+                      const SizedBox(height: 4.0),
+                      Text(
+                        'Método: ${payment.paymentMethod}',
+                        style: const TextStyle(color: Colors.green, fontSize: 12.0),
+                      ),
+                    ],
+                  )
+                : const Text(
+                    'Pendente',
+                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12.0),
+                  ),
+          );
+        }).toList();
+      }
+    }
+
+    // Se por algum motivo não encontrou o estado correto, retorna o estado de carregamento
+    return [
+      const Center(child: CircularProgressIndicator()),
     ];
   }
+
+  // List<Widget> _buildPaymentListForAdmin(BuildContext context, int contractId) {
+    
+  //   context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: contractId, context: context));
+
+  //   return [
+  //     BlocBuilder<PaymentBloc, PaymentState>(
+  //       builder: (context, paymentState) {
+  //         if (paymentState is PaymentsLoaded) {
+  //           final payments = paymentState.payments.where((payment) => payment.contractId == contractId).toList();
+
+  //           if (payments.isEmpty) {
+  //             return const ListTile(
+  //               title: Text('Nenhuma parcela encontrada.'),
+  //             );
+  //           }
+
+  //           return Column(
+  //             children: payments.map((payment) {
+  //               return ListTile(
+  //                 title: Text('Parcela ${payment.numberOfParcel}'),
+  //                 subtitle: Text('Valor: R\$${payment.value}\nVencimento: ${_formatDate(payment.dueDate)}'),
+  //                 trailing: payment.wasPaid
+  //                     ? Column(
+  //                         crossAxisAlignment: CrossAxisAlignment.end,
+  //                         children: [
+  //                           Container(
+  //                             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+  //                             decoration: BoxDecoration(
+  //                               border: Border.all(color: Colors.green),
+  //                               borderRadius: BorderRadius.circular(12.0),
+  //                               color: Colors.transparent,
+  //                             ),
+  //                             child: Text(
+  //                               'Pago em ${_formatDateTime(payment.updatedAt)}',
+  //                               style: const TextStyle(color: Colors.green),
+  //                             ),
+  //                           ),
+  //                           const SizedBox(height: 4.0),
+  //                           Text(
+  //                             'Método: ${payment.paymentMethod}',
+  //                             style: const TextStyle(color: Colors.green, fontSize: 12.0),
+  //                           ),
+  //                         ],
+  //                       )
+  //                     : const Text(
+  //                         'Pendente',
+  //                         style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12.0),
+  //                       ),
+  //               );
+  //             }).toList(),
+  //           );
+  //         } else {
+  //           return const Center(child: CircularProgressIndicator());
+  //         }
+  //       },
+  //     ),
+  //   ];
+  // }
 
   Widget _buildPaymentList(BuildContext context, List<Payment> payments) {
     return ListView.builder(

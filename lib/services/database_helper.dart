@@ -99,25 +99,16 @@ class DatabaseHelper {
       FOREIGN KEY (treinoId) REFERENCES treino(id) ON DELETE CASCADE
     )''';
 
-    const userPacoteTable = '''CREATE TABLE user_pacote (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      createdAt TEXT NOT NULL,
-      updatedAt TEXT NOT NULL,
-      valido INTEGER NOT NULL,
-      userTreinadorId INTEGER NOT NULL,
-      userAlunoId INTEGER NOT NULL,
-      FOREIGN KEY (userTreinadorId) REFERENCES user(id),
-      FOREIGN KEY (userAlunoId) REFERENCES user(id)
-    )''';
-
     const userPacoteTreinoTable = '''CREATE TABLE user_pacote_treino (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       createdAt TEXT NOT NULL,
       updatedAt TEXT NOT NULL,
-      userPacoteId INTEGER NOT NULL,
       pacoteTreinoId INTEGER NOT NULL,
-      FOREIGN KEY (userPacoteId) REFERENCES user_pacote(id),
-      FOREIGN KEY (pacoteTreinoId) REFERENCES pacote_treino(id)
+      treinadorId INTEGER NOT NULL,
+      alunoId INTEGER NOT NULL,
+      FOREIGN KEY (pacoteTreinoId) REFERENCES pacote_treino(id),
+      FOREIGN KEY (treinadorId) REFERENCES user(id),
+      FOREIGN KEY (alunoId) REFERENCES user(id)
     )''';
 
     const pesosTreinoTable = '''CREATE TABLE pesos_treino (
@@ -145,7 +136,6 @@ class DatabaseHelper {
     await db.execute(treinoTable);
     await db.execute(pacoteTable);
     await db.execute(pacoteTreinoTable);
-    await db.execute(userPacoteTable);
     await db.execute(userPacoteTreinoTable);
     await db.execute(pesosTreinoTable);
     await db.execute(historicoTreinoTable);

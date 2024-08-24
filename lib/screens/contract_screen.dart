@@ -103,9 +103,6 @@ class _ContractScreenState extends State<ContractScreen> {
                   },
                 ),
               ),
-              if (contracts.isNotEmpty &&
-                  (contracts.last.isCompleted || !contracts.last.isValid))
-                _buildAddContractButton(context),
             ],
           );
         } else {
@@ -216,7 +213,7 @@ class _ContractScreenState extends State<ContractScreen> {
           children: [
             Text('Contrato ${contract.id}'),
             if (!contract.isValid && !isMostRecent)
-              _buildCanceledBanner(), // Exibe o banner de Cancelado para contratos não válidos que não são os mais recentes
+              _buildCanceledBanner(), 
             if (userState is UserLoaded && userState.user.accountType == 'admin' && !contract.isCompleted && isMostRecent)
               _buildValidationButton(context, contract),
           ],

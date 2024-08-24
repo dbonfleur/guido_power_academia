@@ -1,5 +1,7 @@
 import 'package:equatable/equatable.dart';
-import '../../models/treino_model.dart';
+
+import '../../models/treino_model/user_pacote_treino.dart';
+
 
 abstract class UserPacoteTreinoState extends Equatable {
   const UserPacoteTreinoState();

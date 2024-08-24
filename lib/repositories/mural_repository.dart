@@ -4,7 +4,7 @@ import '../services/database_helper.dart';
 class MuralRepository {
   final DatabaseHelper databaseHelper;
 
-  MuralRepository({required this.databaseHelper});
+  MuralRepository(this.databaseHelper);
 
   Future<List<Mural>> getAllMurals() async {
     final db = await databaseHelper.database;

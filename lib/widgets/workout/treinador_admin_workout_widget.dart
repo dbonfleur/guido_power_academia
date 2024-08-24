@@ -3,13 +3,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:guido_power_academia/blocs/theme/theme_bloc.dart';
 import 'package:guido_power_academia/blocs/theme/theme_state.dart';
 
-import '../../blocs/treino/pacote_treino_bloc.dart';
-import '../../blocs/treino/pacote_treino_event.dart';
-import '../../blocs/treino/pacote_treino_state.dart';
+import '../../blocs/treino/pacote_bloc.dart';
+import '../../blocs/treino/pacote_event.dart';
+import '../../blocs/treino/pacote_state.dart';
 import '../../blocs/treino/treino_bloc.dart';
 import '../../blocs/treino/treino_event.dart';
 import '../../blocs/treino/treino_state.dart';
-import '../../models/treino_model.dart';
+import '../../models/treino_model/pacote.dart';
+import '../../models/treino_model/treino.dart';
 import 'multi_select_workout_dropdown.dart';
 
 class TreinadorAdminWorkoutWidget extends StatefulWidget {
@@ -24,7 +25,7 @@ class _TreinadorAdminWorkoutWidgetState extends State<TreinadorAdminWorkoutWidge
   void initState() {
     super.initState();
     context.read<TreinoBloc>().add(LoadTreinos());
-    context.read<PacoteTreinoBloc>().add(LoadPacotesTreino());
+    context.read<PacoteBloc>().add(LoadPacotes());
   }
 
   @override
@@ -32,14 +33,14 @@ class _TreinadorAdminWorkoutWidgetState extends State<TreinadorAdminWorkoutWidge
     return SingleChildScrollView(
       child: BlocBuilder<TreinoBloc, TreinoState>(
         builder: (context, treinoState) {
-          return BlocBuilder<PacoteTreinoBloc, PacoteTreinoState>(
-            builder: (context, pacoteTreinoState) {
+          return BlocBuilder<PacoteBloc, PacoteState>(
+            builder: (context, pacoteState) {
               return ExpansionPanelList.radio(
                 children: [
                   _buildAddTreinoPanel(context),
-                  _buildAddPacoteTreinoPanel(context),
+                  _buildAddPacotePanel(context),
                   _buildViewTreinosPanel(context),
-                  _buildViewPacotesTreinoPanel(context),
+                  _buildViewPacotesPanel(context),
                 ],
               );
             },
@@ -152,7 +153,7 @@ class _TreinadorAdminWorkoutWidgetState extends State<TreinadorAdminWorkoutWidge
     );
   }
 
-  ExpansionPanelRadio _buildAddPacoteTreinoPanel(BuildContext context) {
+  ExpansionPanelRadio _buildAddPacotePanel(BuildContext context) {
     final formKey = GlobalKey<FormState>();
     final TextEditingController nomePacoteController = TextEditingController();
     final TextEditingController letraDivisaoController = TextEditingController();
@@ -240,16 +241,14 @@ class _TreinadorAdminWorkoutWidgetState extends State<TreinadorAdminWorkoutWidge
                   return ElevatedButton(
                     onPressed: () {
                       if (formKey.currentState!.validate() && selectedTreinos.isNotEmpty) {
-                        final novoPacote = PacoteTreino(
-                          id: null,
+                        final novoPacote = Pacote(
                           nomePacote: nomePacoteController.text,
                           letraDivisao: letraDivisaoController.text,
                           tipoTreino: tipoTreinoController.text,
-                          treinos: selectedTreinos,
                           createdAt: DateTime.now(),
                           updatedAt: DateTime.now(),
                         );
-                        context.read<PacoteTreinoBloc>().add(CreatePacoteTreino(novoPacote));
+                        context.read<PacoteBloc>().add(CreatePacote(novoPacote));
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -319,7 +318,7 @@ class _TreinadorAdminWorkoutWidgetState extends State<TreinadorAdminWorkoutWidge
     );
   }
 
-  ExpansionPanelRadio _buildViewPacotesTreinoPanel(BuildContext context) {
+  ExpansionPanelRadio _buildViewPacotesPanel(BuildContext context) {
     return ExpansionPanelRadio(
       value: 3,
       headerBuilder: (context, isExpanded) {
@@ -328,17 +327,17 @@ class _TreinadorAdminWorkoutWidgetState extends State<TreinadorAdminWorkoutWidge
           title: Text("Visualizar Pacotes de Treino"),
         );
       },
-      body: BlocBuilder<PacoteTreinoBloc, PacoteTreinoState>(
+      body: BlocBuilder<PacoteBloc, PacoteState>(
         builder: (context, state) {
-          if (state is PacoteTreinoLoaded) {
+          if (state is PacoteLoaded) {
             return ListView.builder(
               shrinkWrap: true,
-              itemCount: state.pacotesTreino.length,
+              itemCount: state.pacotes.length,
               itemBuilder: (context, index) {
-                final pacoteTreino = state.pacotesTreino[index];
+                final pacote = state.pacotes[index];
                 return ListTile(
-                  title: Text(pacoteTreino.nomePacote),
-                  subtitle: Text('Divisão: ${pacoteTreino.letraDivisao}'),
+                  title: Text(pacote.nomePacote),
+                  subtitle: Text('Divisão: ${pacote.letraDivisao}'),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -351,7 +350,7 @@ class _TreinadorAdminWorkoutWidgetState extends State<TreinadorAdminWorkoutWidge
                       IconButton(
                         icon: const Icon(Icons.delete),
                         onPressed: () {
-                          context.read<PacoteTreinoBloc>().add(DeletePacoteTreino(pacoteTreino.id!));
+                          context.read<PacoteBloc>().add(DeletePacote(pacote.id!));
                         },
                       ),
                     ],
@@ -359,7 +358,7 @@ class _TreinadorAdminWorkoutWidgetState extends State<TreinadorAdminWorkoutWidge
                 );
               },
             );
-          } else if (state is PacoteTreinoLoading) {
+          } else if (state is PacoteLoading) {
             return const Center(child: CircularProgressIndicator());
           } else {
             return const Text("Erro ao carregar pacotes de treino.");

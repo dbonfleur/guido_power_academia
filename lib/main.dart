@@ -6,6 +6,12 @@ import 'package:nested/nested.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'blocs/treino/pacote_bloc.dart';
+import 'repositories/historico_treino_repository.dart';
+import 'repositories/pacote_repository.dart';
+import 'repositories/pacote_treino_repository.dart';
+import 'repositories/pesos_treino_repository.dart';
+import 'repositories/user_pacote_treino_repository.dart';
 import 'services/database_helper.dart';
 
 import 'blocs/contract/contract_bloc.dart';
@@ -28,7 +34,7 @@ import 'blocs/mural/mural_bloc.dart';
 import 'repositories/contract_repository.dart';
 import 'repositories/payment_repository.dart';
 import 'repositories/user_repository.dart';
-import 'repositories/message_repository.dart';
+import 'repositories/mural_repository.dart';
 import 'repositories/treino_repository.dart';
 
 import 'screens/login_screen.dart';
@@ -48,42 +54,26 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   }
 
-  final userRepository = UserRepository(DatabaseHelper.instance);
-  final muralRepository = MuralRepository(databaseHelper: DatabaseHelper.instance);
-  final treinoRepository = TreinoRepository(DatabaseHelper.instance);
-  final contractRepository = ContractRepository(DatabaseHelper.instance);
-  final paymentRepository = PaymentRepository(DatabaseHelper.instance);
-
   final prefs = await SharedPreferences.getInstance();
   final bool introSeen = prefs.getBool('introSeen') ?? false;
 
-  runApp(MyApp(
-    userRepository: userRepository,
-    muralRepository: muralRepository,
-    treinoRepository: treinoRepository,
-    contractRepository: contractRepository,
-    paymentRepository: paymentRepository,
-    introSeen: introSeen,
-  ));
+  runApp(MyApp(introSeen: introSeen));
 }
 
 class MyApp extends StatelessWidget {
-  final UserRepository userRepository;
-  final MuralRepository muralRepository;
-  final TreinoRepository treinoRepository;
-  final ContractRepository contractRepository;
-  final PaymentRepository paymentRepository;
+  final userRepository = UserRepository(DatabaseHelper.instance);
+  final muralRepository = MuralRepository(DatabaseHelper.instance);
+  final treinoRepository = TreinoRepository(DatabaseHelper.instance);
+  final contractRepository = ContractRepository(DatabaseHelper.instance);
+  final paymentRepository = PaymentRepository(DatabaseHelper.instance);
+  final pacoteRepository = PacoteRepository(DatabaseHelper.instance);
+  final userPacoteTreinoRepository = UserPacoteTreinoRepository(DatabaseHelper.instance);
+  final pacoteTreinoRepository = PacoteTreinoRepository(DatabaseHelper.instance);
+  final historicoTreinoRepository = HistoricoTreinoRepository(DatabaseHelper.instance);
+  final pesosTreinoRepository = PesosTreinoRepository(DatabaseHelper.instance);
   final bool introSeen;
 
-  const MyApp({
-    super.key,
-    required this.userRepository,
-    required this.muralRepository,
-    required this.treinoRepository,
-    required this.contractRepository,
-    required this.paymentRepository,
-    required this.introSeen,
-  });
+  MyApp({super.key, required this.introSeen});
 
   @override
   Widget build(BuildContext context) {
@@ -130,16 +120,19 @@ class MyApp extends StatelessWidget {
         create: (context) => TreinoBloc(treinoRepository),
       ),
       BlocProvider(
-        create: (context) => UserPacoteTreinoBloc(treinoRepository)
+        create: (context) => UserPacoteTreinoBloc(userPacoteTreinoRepository),
       ),
       BlocProvider(
-        create: (context) => PesosTreinoBloc(treinoRepository)
+        create: (context) => PesosTreinoBloc(pesosTreinoRepository),
       ),
       BlocProvider(
-        create: (context) => PacoteTreinoBloc(treinoRepository)
+        create: (context) => PacoteBloc(pacoteRepository),
       ),
       BlocProvider(
-        create: (context) => HistoricoTreinoBloc(treinoRepository),
+        create: (context) => PacoteTreinoBloc(pacoteTreinoRepository),
+      ),
+      BlocProvider(
+        create: (context) => HistoricoTreinoBloc(historicoTreinoRepository),
       ),
       BlocProvider(
         create: (context) => TrainerBloc(userRepository),

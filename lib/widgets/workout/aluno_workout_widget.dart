@@ -26,7 +26,7 @@ class AlunoWorkoutWidget extends StatelessWidget {
               itemBuilder: (context, index) {
                 final pacoteTreino = state.userPacotesTreino[index].pacoteTreino;
                 return ExpansionTile(
-                  title: Text(pacoteTreino.nomePacote),
+                  title: Text(pacoteTreino.treinos[index].nome),
                   children: pacoteTreino.treinos.map((treino) {
                     return ListTile(
                       title: Text(treino.nome),

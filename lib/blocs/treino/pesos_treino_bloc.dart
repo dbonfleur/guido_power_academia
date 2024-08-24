@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../repositories/treino_repository.dart';
+import '../../repositories/pesos_treino_repository.dart';
 import 'pesos_treino_event.dart';
 import 'pesos_treino_state.dart';
 
 class PesosTreinoBloc extends Bloc<PesosTreinoEvent, PesosTreinoState> {
-  final TreinoRepository treinoRepository;
+  final PesosTreinoRepository treinoRepository;
 
   PesosTreinoBloc(this.treinoRepository) : super(PesosTreinoInitial()) {
     on<LoadPesosTreino>(_onLoadPesosTreino);
