@@ -10,6 +10,15 @@ abstract class TreinoEvent extends Equatable {
 
 class LoadTreinos extends TreinoEvent {}
 
+class LoadTreinosByIds extends TreinoEvent {
+  final List<int> treinoIds;
+
+  const LoadTreinosByIds(this.treinoIds);
+
+  @override
+  List<Object?> get props => [treinoIds];
+}
+
 class CreateTreino extends TreinoEvent {
   final Treino treino;
 

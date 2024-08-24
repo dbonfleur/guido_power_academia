@@ -10,7 +10,16 @@ abstract class UserPacoteTreinoEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadUserPacotesTreino extends UserPacoteTreinoEvent {}
+class LoadUserPacoteTreino extends UserPacoteTreinoEvent {}
+
+class LoadUserPacotesTreino extends UserPacoteTreinoEvent {
+  final int userId;
+
+  const LoadUserPacotesTreino(this.userId);
+
+  @override
+  List<Object?> get props => [userId];
+}
 
 class CreateUserPacoteTreino extends UserPacoteTreinoEvent {
   final UserPacoteTreino userPacoteTreino;

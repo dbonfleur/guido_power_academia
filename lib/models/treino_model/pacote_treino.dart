@@ -1,18 +1,16 @@
-import 'treino.dart';
-
 class PacoteTreino {
   final int? id;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final int? pacoteId;
-  final List<Treino> treinos;
+  final int pacoteId;
+  final List<int> treinoIds;
 
   PacoteTreino({
     this.id,
     required this.createdAt,
     required this.updatedAt,
-    this.pacoteId,
-    this.treinos = const [],
+    required this.pacoteId,
+    required this.treinoIds,
   });
 
   Map<String, dynamic> toMap() {
@@ -21,7 +19,7 @@ class PacoteTreino {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'pacoteId': pacoteId,
-      'treinos': treinos.map((e) => e.id).toList(),
+      'treinoIds': treinoIds,
     };
   }
 
@@ -31,7 +29,7 @@ class PacoteTreino {
       createdAt: DateTime.parse(map['createdAt']),
       updatedAt: DateTime.parse(map['updatedAt']),
       pacoteId: map['pacoteId'],
-      treinos: List<Treino>.from(map['treinos']),
+      treinoIds: List<int>.from(map['treinoIds']),
     );
   }
 }

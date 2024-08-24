@@ -12,15 +12,24 @@ abstract class PacoteTreinoState extends Equatable {
 
 class PacoteTreinoInitial extends PacoteTreinoState {}
 
-class PacoteTreinoLoading extends PacoteTreinoState {}
+class PacotesTreinoLoading extends PacoteTreinoState {}
 
-class PacoteTreinoLoaded extends PacoteTreinoState {
+class PacotesTreinoLoaded extends PacoteTreinoState {
   final List<PacoteTreino> pacotesTreino;
 
-  const PacoteTreinoLoaded(this.pacotesTreino);
+  const PacotesTreinoLoaded(this.pacotesTreino);
 
   @override
   List<Object?> get props => [pacotesTreino];
+}
+
+class PacoteTreinosByIdLoaded extends PacoteTreinoState {
+  final PacoteTreino pacoteTreino;
+
+  const PacoteTreinosByIdLoaded(this.pacoteTreino);
+
+  @override
+  List<Object?> get props => [pacoteTreino];
 }
 
 class PacoteTreinoError extends PacoteTreinoState {

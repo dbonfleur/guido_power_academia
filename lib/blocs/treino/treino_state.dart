@@ -12,10 +12,19 @@ class TreinoInitial extends TreinoState {}
 
 class TreinoLoading extends TreinoState {}
 
-class TreinoLoaded extends TreinoState {
+class TreinosLoaded extends TreinoState {
   final List<Treino> treinos;
 
-  const TreinoLoaded(this.treinos);
+  const TreinosLoaded(this.treinos);
+
+  @override
+  List<Object?> get props => [treinos];
+}
+
+class TreinosByIdLoaded extends TreinoState {
+  final List<Treino> treinos;
+
+  const TreinosByIdLoaded(this.treinos);
 
   @override
   List<Object?> get props => [treinos];

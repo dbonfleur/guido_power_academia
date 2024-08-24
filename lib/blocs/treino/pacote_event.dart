@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
 
+
 import '../../models/treino_model/pacote.dart';
+import '../../models/treino_model/treino.dart';
 
 abstract class PacoteEvent extends Equatable {
   const PacoteEvent();
@@ -11,13 +13,23 @@ abstract class PacoteEvent extends Equatable {
 
 class LoadPacotes extends PacoteEvent {}
 
-class CreatePacote extends PacoteEvent {
-  final Pacote pacote;
+class LoadPacoteById extends PacoteEvent {
+  final int pacoteId;
 
-  const CreatePacote(this.pacote);
+  const LoadPacoteById(this.pacoteId);
 
   @override
-  List<Object?> get props => [pacote];
+  List<Object?> get props => [pacoteId];
+}
+
+class CreatePacote extends PacoteEvent {
+  final Pacote pacote;
+  final List<Treino> treinos;
+
+  const CreatePacote(this.pacote, this.treinos);
+
+  @override
+  List<Object?> get props => [pacote, treinos];
 }
 
 class UpdatePacote extends PacoteEvent {

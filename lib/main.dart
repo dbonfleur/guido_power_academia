@@ -126,7 +126,7 @@ class MyApp extends StatelessWidget {
         create: (context) => PesosTreinoBloc(pesosTreinoRepository),
       ),
       BlocProvider(
-        create: (context) => PacoteBloc(pacoteRepository),
+        create: (context) => PacoteBloc(pacoteRepository, pacoteTreinoRepository),
       ),
       BlocProvider(
         create: (context) => PacoteTreinoBloc(pacoteTreinoRepository),

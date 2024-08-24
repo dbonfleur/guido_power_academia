@@ -14,9 +14,19 @@ class PacoteInitial extends PacoteState {}
 class PacoteLoading extends PacoteState {}
 
 class PacoteLoaded extends PacoteState {
+  final Pacote pacote;
+  final List<int> treinoIds;
+
+  const PacoteLoaded(this.pacote, this.treinoIds);
+
+  @override
+  List<Object?> get props => [pacote, treinoIds];
+}
+
+class PacotesLoaded extends PacoteState {
   final List<Pacote> pacotes;
 
-  const PacoteLoaded(this.pacotes);
+  const PacotesLoaded(this.pacotes);
 
   @override
   List<Object?> get props => [pacotes];

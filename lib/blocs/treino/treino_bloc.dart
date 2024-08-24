@@ -11,13 +11,24 @@ class TreinoBloc extends Bloc<TreinoEvent, TreinoState> {
     on<CreateTreino>(_onCreateTreino);
     on<UpdateTreino>(_onUpdateTreino);
     on<DeleteTreino>(_onDeleteTreino);
+    on<LoadTreinosByIds>(_onLoadTreinosByIds);
   }
 
   Future<void> _onLoadTreinos(LoadTreinos event, Emitter<TreinoState> emit) async {
     emit(TreinoLoading());
     try {
       final treinos = await treinoRepository.getAllTreinos();
-      emit(TreinoLoaded(treinos));
+      emit(TreinosLoaded(treinos));
+    } catch (e) {
+      emit(TreinoError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadTreinosByIds(LoadTreinosByIds event, Emitter<TreinoState> emit) async {
+    emit(TreinoLoading());
+    try {
+      final treinos = await treinoRepository.getTreinosByIds(event.treinoIds);
+      emit(TreinosByIdLoaded(treinos));
     } catch (e) {
       emit(TreinoError(e.toString()));
     }

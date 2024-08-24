@@ -26,4 +26,10 @@ class PacoteRepository {
     final db = await databaseHelper.database;
     return await db.delete('pacote', where: 'id = ?', whereArgs: [id]);
   }
+
+  Future<Pacote> getPacoteById(int pacoteId) async {
+    final db = await databaseHelper.database;
+    final result = await db.query('pacote', where: 'id = ?', whereArgs: [pacoteId]);
+    return Pacote.fromMap(result.first);
+  }
 }

@@ -39,10 +39,12 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
           final prefs = await SharedPreferences.getInstance();
           await prefs.setBool('isLoggedIn', true);
           await prefs.setString('username', user.username);
+          await prefs.setInt('userId', user.id!);
         } else {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setBool('isLoggedIn', false);
           await prefs.remove('username');
+          await prefs.remove('userId');
         }
         emit(AuthenticationSuccess(user));
       } else {
@@ -81,7 +83,7 @@ class AuthenticationBloc extends Bloc<AuthenticationEvent, AuthenticationState> 
     Emitter<AuthenticationState> emit,
   ) async {
     final prefs = await SharedPreferences.getInstance();
-    final introSeen =prefs.getBool('introSeen') ?? false;
+    final introSeen = prefs.getBool('introSeen') ?? false;
     await prefs.clear();
     if(introSeen){
       prefs.setBool('introSeen', true); 

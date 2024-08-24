@@ -26,4 +26,10 @@ class TreinoRepository {
     final db = await databaseHelper.database;
     return await db.delete('treino', where: 'id = ?', whereArgs: [id]);
   }
+
+  Future<List<Treino>> getTreinosByIds(List<int> treinoIds) async {
+    final db = await databaseHelper.database;
+    final result = await db.query('treino', where: 'id IN (${treinoIds.join(',')})');
+    return result.map((e) => Treino.fromMap(e)).toList();
+  }
 }
