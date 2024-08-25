@@ -338,70 +338,10 @@ class _FinanceScreenState extends State<FinanceScreen> {
       }
     }
 
-    // Se por algum motivo não encontrou o estado correto, retorna o estado de carregamento
     return [
       const Center(child: CircularProgressIndicator()),
     ];
   }
-
-  // List<Widget> _buildPaymentListForAdmin(BuildContext context, int contractId) {
-    
-  //   context.read<PaymentBloc>().add(LoadPaymentsByContract(contractId: contractId, context: context));
-
-  //   return [
-  //     BlocBuilder<PaymentBloc, PaymentState>(
-  //       builder: (context, paymentState) {
-  //         if (paymentState is PaymentsLoaded) {
-  //           final payments = paymentState.payments.where((payment) => payment.contractId == contractId).toList();
-
-  //           if (payments.isEmpty) {
-  //             return const ListTile(
-  //               title: Text('Nenhuma parcela encontrada.'),
-  //             );
-  //           }
-
-  //           return Column(
-  //             children: payments.map((payment) {
-  //               return ListTile(
-  //                 title: Text('Parcela ${payment.numberOfParcel}'),
-  //                 subtitle: Text('Valor: R\$${payment.value}\nVencimento: ${_formatDate(payment.dueDate)}'),
-  //                 trailing: payment.wasPaid
-  //                     ? Column(
-  //                         crossAxisAlignment: CrossAxisAlignment.end,
-  //                         children: [
-  //                           Container(
-  //                             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-  //                             decoration: BoxDecoration(
-  //                               border: Border.all(color: Colors.green),
-  //                               borderRadius: BorderRadius.circular(12.0),
-  //                               color: Colors.transparent,
-  //                             ),
-  //                             child: Text(
-  //                               'Pago em ${_formatDateTime(payment.updatedAt)}',
-  //                               style: const TextStyle(color: Colors.green),
-  //                             ),
-  //                           ),
-  //                           const SizedBox(height: 4.0),
-  //                           Text(
-  //                             'Método: ${payment.paymentMethod}',
-  //                             style: const TextStyle(color: Colors.green, fontSize: 12.0),
-  //                           ),
-  //                         ],
-  //                       )
-  //                     : const Text(
-  //                         'Pendente',
-  //                         style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12.0),
-  //                       ),
-  //               );
-  //             }).toList(),
-  //           );
-  //         } else {
-  //           return const Center(child: CircularProgressIndicator());
-  //         }
-  //       },
-  //     ),
-  //   ];
-  // }
 
   Widget _buildPaymentList(BuildContext context, List<Payment> payments) {
     return ListView.builder(

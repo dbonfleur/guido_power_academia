@@ -359,43 +359,52 @@ class _TreinadorAdminWorkoutWidgetState
                   children: [
                     BlocBuilder<PacoteTreinoBloc, PacoteTreinoState>(
                       builder: (context, pacoteTreinoState) {
-                        if (pacoteTreinoState is PacoteTreinosByIdLoaded) {
-                          final treinoIds = pacoteTreinoState.pacoteTreino.treinoIds;
+                        if (pacoteTreinoState is TreinoIdsLoaded) {
+                          final treinoIds = pacoteTreinoState.treinoIds;
 
                           if (treinoIds.isNotEmpty) {
                             context
                                 .read<TreinoBloc>()
                                 .add(LoadTreinosByIds(treinoIds));
                           }
-                        }
 
-                        return BlocBuilder<TreinoBloc, TreinoState>(
-                          builder: (context, treinoState) {
-                            if (treinoState is TreinosByIdLoaded) {
-                              final treinos = treinoState.treinos;
-                              return ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: treinos.length,
-                                itemBuilder: (context, index) {
-                                  final treino = treinos[index];
-                                  return ListTile(
-                                    title: Text(treino.nome),
-                                    subtitle: Text(
-                                        '${treino.qtdSeries} x ${treino.qtdRepeticoes}'),
-                                  );
-                                },
-                              );
-                            } else if (treinoState is TreinoLoading) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            } else if (treinoState is TreinoError) {
-                              return const Center(
-                                  child: Text("Erro ao carregar treinos."));
-                            } else {
-                              return const SizedBox();
-                            }
-                          },
-                        );
+                          return BlocBuilder<TreinoBloc, TreinoState>(
+                            builder: (context, treinoState) {
+                              if (treinoState is TreinosByIdLoaded) {
+                                final treinos = treinoState.treinos;
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: treinos.length,
+                                  itemBuilder: (context, index) {
+                                    final treino = treinos[index];
+                                    return ListTile(
+                                      title: Text(treino.nome),
+                                      subtitle: Text(
+                                          '${treino.qtdSeries} x ${treino.qtdRepeticoes}'),
+                                    );
+                                  },
+                                );
+                              } else if (treinoState is TreinoLoading) {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              } else if (treinoState is TreinoError) {
+                                return const Center(
+                                    child: Text("Erro ao carregar treinos."));
+                              } else {
+                                return const SizedBox();
+                              }
+                            },
+                          );
+                        } else if (pacoteTreinoState is PacotesTreinoLoading) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        } else if (pacoteTreinoState is PacoteTreinoError) {
+                          return const Center(
+                              child:
+                                  Text("Erro ao carregar treinos do pacote."));
+                        } else {
+                          return const SizedBox();
+                        }
                       },
                     ),
                   ],

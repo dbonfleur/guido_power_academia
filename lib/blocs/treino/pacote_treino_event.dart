@@ -20,12 +20,12 @@ class LoadPacoteTreino extends PacoteTreinoEvent {
 }
 
 class LoadPacoteTreinosById extends PacoteTreinoEvent {
-  final int pacoteTreinoId;
+  final int pacoteId;
 
-  const LoadPacoteTreinosById(this.pacoteTreinoId);
+  const LoadPacoteTreinosById(this.pacoteId);
 
   @override
-  List<Object?> get props => [pacoteTreinoId];
+  List<Object?> get props => [pacoteId];
 }
 
 class CreatePacoteTreino extends PacoteTreinoEvent {

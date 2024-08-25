@@ -32,6 +32,15 @@ class PacoteTreinosByIdLoaded extends PacoteTreinoState {
   List<Object?> get props => [pacoteTreino];
 }
 
+class TreinoIdsLoaded extends PacoteTreinoState {
+  final List<int> treinoIds;
+
+  const TreinoIdsLoaded(this.treinoIds);
+
+  @override
+  List<Object?> get props => [treinoIds];
+}
+
 class PacoteTreinoError extends PacoteTreinoState {
   final String message;
 

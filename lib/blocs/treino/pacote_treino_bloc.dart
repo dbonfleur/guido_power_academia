@@ -27,8 +27,8 @@ class PacoteTreinoBloc extends Bloc<PacoteTreinoEvent, PacoteTreinoState> {
   Future<void> _onLoadPacoteTreinosById(LoadPacoteTreinosById event, Emitter<PacoteTreinoState> emit) async {
     emit(PacotesTreinoLoading());
     try {
-      final pacoteTreino = await pacoteTreinoRepo.getPacoteTreinosById(event.pacoteTreinoId);
-      emit(PacoteTreinosByIdLoaded(pacoteTreino));
+      final treinoIds = await pacoteTreinoRepo.getTreinoIdsByPacoteId(event.pacoteId);
+      emit(TreinoIdsLoaded(treinoIds));
     } catch (e) {
       emit(PacoteTreinoError(e.toString()));
     }

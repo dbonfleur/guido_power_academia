@@ -6,7 +6,7 @@ class PacoteTreinoRepository {
 
   PacoteTreinoRepository(this.databaseHelper);
 
-  Future<PacoteTreino> createPacoteTreino(PacoteTreino pacoteTreino) async {
+  Future<void> createPacoteTreino(PacoteTreino pacoteTreino) async {
     final db = await databaseHelper.database;
     
     for (var treinoId in pacoteTreino.treinoIds) {
@@ -17,8 +17,6 @@ class PacoteTreinoRepository {
         'updatedAt': pacoteTreino.updatedAt.toIso8601String(),
       });
     }
-    
-    return getPacoteTreinosById(pacoteTreino.pacoteId);
   }
 
   Future<List<PacoteTreino>> getAllPacotesTreino() async {
@@ -41,11 +39,5 @@ class PacoteTreinoRepository {
     final db = await databaseHelper.database;
     final result = await db.query('pacote_treino', where: 'pacoteId = ?', whereArgs: [pacoteId]);
     return result.map((e) => e['treinoId'] as int).toList();
-  }
-
-  Future<PacoteTreino> getPacoteTreinosById(int pacoteTreinoId) async {
-    final db = await databaseHelper.database;
-    final result = await db.query('pacote_treino', where: 'id = ?', whereArgs: [pacoteTreinoId]);
-    return PacoteTreino.fromMap(result.first);
   }
 }
