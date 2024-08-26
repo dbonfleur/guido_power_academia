@@ -40,4 +40,19 @@ class PacoteTreinoRepository {
     final result = await db.query('pacote_treino', where: 'pacoteId = ?', whereArgs: [pacoteId]);
     return result.map((e) => e['treinoId'] as int).toList();
   }
+
+  Future<int> removeTreinoFromPacote(int idPacote, int idTreino) async {
+    final db = await databaseHelper.database;
+    return await db.delete('pacote_treino', where: 'pacoteId = ? AND treinoId = ?', whereArgs: [idPacote, idTreino]);
+  }
+
+  Future<void> addTreinoToPacote(int idPacote, int idTreino) async {
+    final db = await databaseHelper.database;
+    await db.insert('pacote_treino', {
+      'pacoteId': idPacote,
+      'treinoId': idTreino,
+      'createdAt': DateTime.now().toIso8601String(),
+      'updatedAt': DateTime.now().toIso8601String(),
+    });
+  }
 }

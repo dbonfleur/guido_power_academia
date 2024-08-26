@@ -242,7 +242,7 @@ class _FinanceScreenState extends State<FinanceScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Contrato ${contract.id}'),
+                    Text('Contrato ${contract.id} '),
                     _buildContractStatusBanner(contract.isCompleted, contract.isValid),
                   ],
                 ),
@@ -286,10 +286,8 @@ class _FinanceScreenState extends State<FinanceScreen> {
   Future<List<Widget>> _buildPaymentListForAdmin(BuildContext context, int contractId) async {
     final paymentBloc = context.read<PaymentBloc>();
 
-    // Adiciona o evento para carregar os pagamentos do contrato
     paymentBloc.add(LoadPaymentsByContract(contractId: contractId, context: context));
 
-    // Espera até que o PaymentsLoaded seja emitido
     await for (final state in paymentBloc.stream) {
       if (state is PaymentsLoaded && state.payments.isNotEmpty && state.payments.first.contractId == contractId) {
         final payments = state.payments.where((payment) => payment.contractId == contractId).toList();

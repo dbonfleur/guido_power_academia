@@ -1,6 +1,4 @@
 import 'package:equatable/equatable.dart';
-
-
 import '../../models/treino_model/pacote.dart';
 import '../../models/treino_model/treino.dart';
 
@@ -34,11 +32,12 @@ class CreatePacote extends PacoteEvent {
 
 class UpdatePacote extends PacoteEvent {
   final Pacote pacote;
+  final List<Treino> treinos;
 
-  const UpdatePacote(this.pacote);
+  const UpdatePacote(this.pacote, this.treinos);
 
   @override
-  List<Object?> get props => [pacote];
+  List<Object?> get props => [pacote, treinos];
 }
 
 class DeletePacote extends PacoteEvent {

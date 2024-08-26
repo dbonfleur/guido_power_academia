@@ -4,11 +4,13 @@ import '../../models/treino_model/treino.dart';
 class MultiSelectWorkoutDropdown extends StatefulWidget {
   final List<Treino> workoutList;
   final Function(List<Treino>) onChanged;
+  final List<Treino> initiallySelected;
 
   const MultiSelectWorkoutDropdown({
     super.key,
     required this.workoutList,
     required this.onChanged,
+    this.initiallySelected = const [],
   });
 
   @override
@@ -16,13 +18,15 @@ class MultiSelectWorkoutDropdown extends StatefulWidget {
 }
 
 class _MultiSelectWorkoutDropdownState extends State<MultiSelectWorkoutDropdown> {
-  final List<Treino> _selectedWorkouts = [];
+  late List<Treino> _selectedWorkouts;
   final TextEditingController _searchController = TextEditingController();
   List<Treino> _filteredWorkouts = [];
 
   @override
   void initState() {
     super.initState();
+
+    _selectedWorkouts = List<Treino>.from(widget.initiallySelected);
     _filteredWorkouts = widget.workoutList;
     _searchController.addListener(_filterWorkouts);
   }
