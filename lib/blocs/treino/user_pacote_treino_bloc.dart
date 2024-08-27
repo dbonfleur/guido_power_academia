@@ -16,8 +16,8 @@ class UserPacoteTreinoBloc extends Bloc<UserPacoteTreinoEvent, UserPacoteTreinoS
   Future<void> _onLoadUserPacotesTreino(LoadUserPacotesTreino event, Emitter<UserPacoteTreinoState> emit) async {
     emit(UserPacoteTreinoLoading());
     try {
-      final pacoteTreino = await userPacoteTreinoRepo.getPacoteTreinoIdsByUser(event.userId);
-      emit(UserPacoteTreinoLoaded(pacoteTreino.map((pt) => pt.pacoteTreino.id!).toList(), pacoteTreino));
+      final pacotesTreino = await userPacoteTreinoRepo.getPacoteTreinoIdsByUser(event.userId);
+      emit(UserPacoteTreinoLoaded(pacotesTreino.map((pt) => pt.pacoteId).toList(), pacotesTreino));
     } catch (e) {
       emit(UserPacoteTreinoError(e.toString()));
     }
@@ -26,7 +26,7 @@ class UserPacoteTreinoBloc extends Bloc<UserPacoteTreinoEvent, UserPacoteTreinoS
   Future<void> _onCreateUserPacoteTreino(CreateUserPacoteTreino event, Emitter<UserPacoteTreinoState> emit) async {
     try {
       await userPacoteTreinoRepo.createUserPacoteTreino(event.userPacoteTreino);
-      add(LoadUserPacoteTreino());
+      add(LoadUserPacotesTreino(event.userPacoteTreino.alunoId));
     } catch (e) {
       emit(UserPacoteTreinoError(e.toString()));
     }
@@ -35,7 +35,7 @@ class UserPacoteTreinoBloc extends Bloc<UserPacoteTreinoEvent, UserPacoteTreinoS
   Future<void> _onUpdateUserPacoteTreino(UpdateUserPacoteTreino event, Emitter<UserPacoteTreinoState> emit) async {
     try {
       await userPacoteTreinoRepo.updateUserPacoteTreino(event.userPacoteTreino);
-      add(LoadUserPacoteTreino());
+      add(LoadUserPacotesTreino(event.userPacoteTreino.alunoId)); 
     } catch (e) {
       emit(UserPacoteTreinoError(e.toString()));
     }
@@ -44,7 +44,7 @@ class UserPacoteTreinoBloc extends Bloc<UserPacoteTreinoEvent, UserPacoteTreinoS
   Future<void> _onDeleteUserPacoteTreino(DeleteUserPacoteTreino event, Emitter<UserPacoteTreinoState> emit) async {
     try {
       await userPacoteTreinoRepo.deleteUserPacoteTreino(event.id);
-      add(LoadUserPacoteTreino());
+      emit(UserPacoteTreinoInitial());
     } catch (e) {
       emit(UserPacoteTreinoError(e.toString()));
     }

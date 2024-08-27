@@ -1,22 +1,20 @@
-import 'pacote_treino.dart';
-
 class UserPacoteTreino {
   final int? id;
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool valido;
-  final PacoteTreino pacoteTreino;
-  final int userTreinadorId;
-  final int userAlunoId;
+  final int pacoteId;
+  final int treinadorId;
+  final int alunoId;
 
   UserPacoteTreino({
     this.id,
     required this.createdAt,
     required this.updatedAt,
     required this.valido,
-    required this.pacoteTreino,
-    required this.userTreinadorId,
-    required this.userAlunoId,
+    required this.pacoteId,
+    required this.treinadorId,
+    required this.alunoId,
   });
 
   Map<String, dynamic> toMap() {
@@ -25,9 +23,9 @@ class UserPacoteTreino {
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
       'valido': valido ? 1 : 0,
-      'pacoteTreinoId': pacoteTreino.id,
-      'userTreinadorId': userTreinadorId,
-      'userAlunoId': userAlunoId,
+      'pacoteId': pacoteId,
+      'treinadorId': treinadorId,
+      'alunoId': alunoId,
     };
   }
 
@@ -37,9 +35,9 @@ class UserPacoteTreino {
       createdAt: DateTime.parse(map['createdAt']),
       updatedAt: DateTime.parse(map['updatedAt']),
       valido: map['valido'] == 1,
-      pacoteTreino: PacoteTreino.fromMap(map),
-      userTreinadorId: map['userTreinadorId'],
-      userAlunoId: map['userAlunoId'],
+      pacoteId: map['pacoteId'],
+      treinadorId: map['treinadorId'],
+      alunoId: map['alunoId'],
     );
   }
 }

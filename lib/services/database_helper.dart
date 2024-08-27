@@ -103,12 +103,13 @@ class DatabaseHelper {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       createdAt TEXT NOT NULL,
       updatedAt TEXT NOT NULL,
-      pacoteTreinoId INTEGER NOT NULL,
+      valido INTEGER NOT NULL,
+      pacoteId INTEGER NOT NULL,
       treinadorId INTEGER NOT NULL,
       alunoId INTEGER NOT NULL,
-      FOREIGN KEY (pacoteTreinoId) REFERENCES pacote_treino(id),
-      FOREIGN KEY (treinadorId) REFERENCES user(id),
-      FOREIGN KEY (alunoId) REFERENCES user(id)
+      FOREIGN KEY (pacoteId) REFERENCES pacote(id) ON DELETE CASCADE,
+      FOREIGN KEY (treinadorId) REFERENCES user(id) ON DELETE CASCADE,
+      FOREIGN KEY (alunoId) REFERENCES user(id) ON DELETE CASCADE
     )''';
 
     const pesosTreinoTable = '''CREATE TABLE pesos_treino (

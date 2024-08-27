@@ -14,12 +14,12 @@ class UserPacoteTreinoLoading extends UserPacoteTreinoState {}
 
 class UserPacoteTreinoLoaded extends UserPacoteTreinoState {
   final List<UserPacoteTreino> userPacotesTreino;
-  final List<int> pacoteTreinoIds;
+  final List<int> pacoteIds;
 
-  const UserPacoteTreinoLoaded(this.pacoteTreinoIds, this.userPacotesTreino);
+  const UserPacoteTreinoLoaded(this.pacoteIds, this.userPacotesTreino);
 
   @override
-  List<Object?> get props => [pacoteTreinoIds, userPacotesTreino];
+  List<Object?> get props => [pacoteIds, userPacotesTreino];
 }
 
 class UserPacoteTreinoError extends UserPacoteTreinoState {

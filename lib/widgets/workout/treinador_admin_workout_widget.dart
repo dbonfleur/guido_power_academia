@@ -39,9 +39,14 @@ class _TreinadorAdminWorkoutWidgetState
   }
 
   void _carregarTreinos(int pacoteId) {
+    treinosPorPacote.remove(pacoteId);
     if (!treinosPorPacote.containsKey(pacoteId)) {
       context.read<PacoteTreinoBloc>().add(LoadPacoteTreinosById(pacoteId));
     }
+  }
+
+  void _recarregarTreinos(int pacoteId) {
+    context.read<PacoteTreinoBloc>().add(LoadPacoteTreinosById(pacoteId));
   }
 
   void _editarTreino(Treino treino) {
@@ -290,7 +295,10 @@ class _TreinadorAdminWorkoutWidgetState
           ),
         );
       },
-    );
+    ).then((_) {
+      // Recarregar treinos após a edição do pacote
+      _recarregarTreinos(pacote.id!);
+    });
   }
 
   @override
