@@ -32,4 +32,10 @@ class PacoteRepository {
     final result = await db.query('pacote', where: 'id = ?', whereArgs: [pacoteId]);
     return Pacote.fromMap(result.first);
   }
+
+  Future<List<Pacote>> getPacotesByIds(List<int> pacotesIds) async {
+    final db = await databaseHelper.database;
+    final result = await db.query('pacote', where: 'id IN (${pacotesIds.join(',')})');
+    return result.map((e) => Pacote.fromMap(e)).toList();
+  }
 }

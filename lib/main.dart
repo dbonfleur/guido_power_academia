@@ -85,8 +85,8 @@ class MyApp extends StatelessWidget {
             title: 'Guido Power Academia',
             debugShowCheckedModeBanner: false,
             theme: state.themeData,
-            initialRoute: introSeen ? '/' : '/intro',
-            // initialRoute: '/intro',
+            // initialRoute: introSeen ? '/' : '/intro',
+            initialRoute: '/intro',
             routes: {
               '/': (context) => const LoginScreen(),
               '/register': (context) => const RegistrationScreen(),

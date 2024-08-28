@@ -91,7 +91,7 @@ class _StudentScreenState extends State<StudentScreen> {
                           return ExpansionTile(
                             title: Text(
                               nomePacote,
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             initiallyExpanded: expandedState[nomePacote] ?? false,
                             onExpansionChanged: (expanded) {
@@ -145,7 +145,7 @@ class _StudentScreenState extends State<StudentScreen> {
                           return ExpansionTile(
                             title: Text(
                               nomePacote,
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             initiallyExpanded: expandedState[nomePacote] ?? false,
                             onExpansionChanged: (expanded) {
@@ -193,35 +193,53 @@ class _StudentScreenState extends State<StudentScreen> {
   }
 
   Map<String, List<UserPacoteTreino>> _agruparPacotesPorNome(
-      List<UserPacoteTreino> userPacotesTreino, BuildContext context) {
-    final pacotesAgrupados = <String, List<UserPacoteTreino>>{};
-    for (var userPacote in userPacotesTreino) {
-      final pacote = (context.read<PacoteBloc>().state as PacotesLoaded)
-          .pacotes
-          .firstWhere((p) => p.id == userPacote.pacoteId);
+    List<UserPacoteTreino> userPacotesTreino, BuildContext context) {
+  final pacotesAgrupados = <String, List<UserPacoteTreino>>{};
+
+  for (var userPacote in userPacotesTreino) {
+    // Aguarda até que o estado seja PacotesLoaded
+    final pacoteState = context.read<PacoteBloc>().state;
+    if (pacoteState is! PacotesLoaded) {
+      return {}; // Retorna vazio ou algum valor padrão enquanto espera o estado correto
+    }
+    
+    final pacote = pacoteState.pacotes.firstWhere((p) => p.id == userPacote.pacoteId);
+    
+    if (!pacotesAgrupados.containsKey(pacote.nomePacote)) {
+      pacotesAgrupados[pacote.nomePacote] = [];
+    }
+    pacotesAgrupados[pacote.nomePacote]!.add(userPacote);
+  }
+  
+  return pacotesAgrupados;
+}
+
+Map<String, List<Pacote>> _agruparPacotesNaoVinculadosPorNome(
+    List<Pacote> pacotes, BuildContext context) {
+  final pacotesAgrupados = <String, List<Pacote>>{};
+
+  final userPacoteTreinoState = context.read<UserPacoteTreinoBloc>().state;
+  final vinculadoIds = (userPacoteTreinoState is UserPacoteTreinoLoaded)
+      ? userPacoteTreinoState.pacoteIds
+      : [];
+
+  for (var pacote in pacotes) {
+    if (!vinculadoIds.contains(pacote.id)) {
+
+      final pacoteState = context.read<PacoteBloc>().state;
+      
+      if (pacoteState is! PacotesLoaded) {
+        return {};
+      }
+      
       if (!pacotesAgrupados.containsKey(pacote.nomePacote)) {
         pacotesAgrupados[pacote.nomePacote] = [];
       }
-      pacotesAgrupados[pacote.nomePacote]!.add(userPacote);
+      pacotesAgrupados[pacote.nomePacote]!.add(pacote);
     }
-    return pacotesAgrupados;
   }
 
-  Map<String, List<dynamic>> _agruparPacotesNaoVinculadosPorNome(
-      List<Pacote> pacotes, BuildContext context) {
-    final pacotesAgrupados = <String, List<Pacote>>{};
-    final userPacoteTreinoState = context.read<UserPacoteTreinoBloc>().state;
-    final vinculadoIds = (userPacoteTreinoState is UserPacoteTreinoLoaded)
-        ? userPacoteTreinoState.pacoteIds
-        : [];
-    for (var pacote in pacotes) {
-      if (!vinculadoIds.contains(pacote.id)) {
-        if (!pacotesAgrupados.containsKey(pacote.nomePacote)) {
-          pacotesAgrupados[pacote.nomePacote] = [];
-        }
-        pacotesAgrupados[pacote.nomePacote]!.add(pacote);
-      }
-    }
-    return pacotesAgrupados;
-  }
+  return pacotesAgrupados;
+}
+
 }

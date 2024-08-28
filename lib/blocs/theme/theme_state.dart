@@ -17,7 +17,7 @@ class ThemeState {
         color: Color.fromARGB(255, 224, 224, 224),
       ),
       primaryIconTheme: const IconThemeData(
-        color: Colors.black,
+        color: Color.fromARGB(228, 0, 0, 0),
       ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(

@@ -12,6 +12,7 @@ class PacoteBloc extends Bloc<PacoteEvent, PacoteState> {
   PacoteBloc(this.pacoteRepository, this.pacoteTreinoRepository)
       : super(PacoteInitial()) {
     on<LoadPacoteById>(_onLoadPacoteById);
+    on<LoadPacotesById>(_onLoadPacotesById);
     on<LoadPacotes>(_onLoadPacotes);
     on<CreatePacote>(_onCreatePacote);
     on<UpdatePacote>(_onUpdatePacote);
@@ -26,6 +27,17 @@ class PacoteBloc extends Bloc<PacoteEvent, PacoteState> {
       final treinoIds =
           await pacoteTreinoRepository.getTreinoIdsByPacoteId(event.pacoteId);
       emit(PacoteLoaded(pacote, treinoIds));
+    } catch (e) {
+      emit(PacoteError(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadPacotesById(
+      LoadPacotesById event, Emitter<PacoteState> emit) async {
+    emit(PacoteLoading());
+    try {
+      final pacotes = await pacoteRepository.getPacotesByIds(event.pacotesIds);
+      emit(PacotesLoaded(pacotes));
     } catch (e) {
       emit(PacoteError(e.toString()));
     }

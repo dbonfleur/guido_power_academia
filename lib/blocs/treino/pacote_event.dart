@@ -20,6 +20,15 @@ class LoadPacoteById extends PacoteEvent {
   List<Object?> get props => [pacoteId];
 }
 
+class LoadPacotesById extends PacoteEvent {
+  final List<int> pacotesIds;
+
+  const LoadPacotesById(this.pacotesIds);
+
+  @override
+  List<Object?> get props => [pacotesIds];
+}
+
 class CreatePacote extends PacoteEvent {
   final Pacote pacote;
   final List<Treino> treinos;

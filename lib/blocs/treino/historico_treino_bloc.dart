@@ -24,7 +24,7 @@ class HistoricoTreinoBloc extends Bloc<HistoricoTreinoEvent, HistoricoTreinoStat
   Future<void> _onCreateHistoricoTreino(CreateHistoricoTreino event, Emitter<HistoricoTreinoState> emit) async {
     try {
       await historicoTreinoRepo.createHistoricoTreino(event.historicoTreino);
-      add(LoadHistoricoTreino(event.historicoTreino.userPacoteTreino.id!));
+      add(LoadHistoricoTreino(event.historicoTreino.pacoteTreinoId));
     } catch (e) {
       emit(HistoricoTreinoError(e.toString()));
     }

@@ -84,7 +84,6 @@ class _ContractScreenState extends State<ContractScreen> {
   }
 
   Widget _buildStudentView(BuildContext context, int userId) {
-    context.read<ContractBloc>().add(LoadContractsByUser(userId: userId));
     return BlocBuilder<ContractBloc, ContractState>(
       builder: (context, state) {
         if (state is ContractsLoaded) {
@@ -92,6 +91,7 @@ class _ContractScreenState extends State<ContractScreen> {
           if (contracts.isEmpty) {
             return const Center(child: Text('Nenhum contrato encontrado.'));
           }
+
           return Column(
             children: [
               Expanded(
@@ -207,21 +207,26 @@ class _ContractScreenState extends State<ContractScreen> {
         : false;
 
     return Card(
+      margin: const EdgeInsets.all(8.0),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
       child: ExpansionTile(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Contrato ${contract.id}'),
             if (!contract.isValid && !isMostRecent)
-              _buildCanceledBanner(), 
+              _buildCanceledBanner(),
+            if (contract.isValid) _buildValidityBanner(true),
             if (userState is UserLoaded && userState.user.accountType == 'admin' && !contract.isCompleted && isMostRecent)
               _buildValidationButton(context, contract),
           ],
         ),
+        subtitle: Text('Duração: ${_formatDate(startDate)} - ${_formatDate(endDate)}'),
         children: [
           ListTile(
-            title: Text('Duração: ${_formatDate(startDate)} - ${_formatDate(endDate)}'),
-            subtitle: Row(
+            title: Row(
               children: [
                 _buildContractStatusBanner(contract.isCompleted),
                 const SizedBox(width: 8),
@@ -279,7 +284,7 @@ class _ContractScreenState extends State<ContractScreen> {
     );
   }
 
-  Widget _buildValidationButton(BuildContext context, Contract contract) {
+    Widget _buildValidationButton(BuildContext context, Contract contract) {
     return ElevatedButton(
       onPressed: () {
         if (contract.isValid) {
@@ -296,7 +301,7 @@ class _ContractScreenState extends State<ContractScreen> {
     );
   }
 
-  Widget _buildAddContractButton(BuildContext context) {
+    Widget _buildAddContractButton(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton(
