@@ -115,10 +115,10 @@ class DatabaseHelper {
     const pesosTreinoTable = '''CREATE TABLE pesos_treino (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       createdAt TEXT NOT NULL,
-      treinoId INTEGER NOT NULL,
+      pacoteTreinoId INTEGER NOT NULL,
       peso INTEGER,
       userId INTEGER NOT NULL,
-      FOREIGN KEY (treinoId) REFERENCES treino(id),
+      FOREIGN KEY (pacoteTreinoId) REFERENCES pacote_treino(id),
       FOREIGN KEY (userId) REFERENCES user(id)
     )''';
 
@@ -126,8 +126,8 @@ class DatabaseHelper {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       createdAt TEXT NOT NULL,
       tempoTreino TEXT NOT NULL,
-      userPacoteTreinoId INTEGER NOT NULL,
-      FOREIGN KEY (userPacoteTreinoId) REFERENCES user_pacote_treino(id)
+      pacoteTreinoId INTEGER NOT NULL,
+      FOREIGN KEY (pacoteTreinoId) REFERENCES pacote_treino(id)
     )''';
 
     await db.execute(userTable);

@@ -9,20 +9,28 @@ abstract class HistoricoTreinoEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-class LoadHistoricoTreino extends HistoricoTreinoEvent {
-  final int userPacoteTreinoId;
-
-  const LoadHistoricoTreino(this.userPacoteTreinoId);
-
-  @override
-  List<Object?> get props => [userPacoteTreinoId];
-}
-
-class CreateHistoricoTreino extends HistoricoTreinoEvent {
+class SaveWorkoutTime extends HistoricoTreinoEvent {
   final HistoricoTreino historicoTreino;
 
-  const CreateHistoricoTreino(this.historicoTreino);
+  const SaveWorkoutTime(this.historicoTreino);
 
   @override
   List<Object?> get props => [historicoTreino];
 }
+
+class LoadHistoricoTreino extends HistoricoTreinoEvent {}
+
+class StartWorkoutTimer extends HistoricoTreinoEvent {}
+
+class StopWorkoutTimer extends HistoricoTreinoEvent {}
+
+class UpdateWorkoutTimer extends HistoricoTreinoEvent {
+  final int timeInSeconds;
+
+  const UpdateWorkoutTimer(this.timeInSeconds);
+
+  @override
+  List<Object?> get props => [timeInSeconds];
+}
+
+class ResetWorkoutTimer extends HistoricoTreinoEvent {}

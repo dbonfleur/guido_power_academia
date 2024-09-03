@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
-
 import '../../models/treino_model/peso_treino.dart';
-
 
 abstract class PesosTreinoState extends Equatable {
   const PesosTreinoState();
@@ -15,12 +13,12 @@ class PesosTreinoInitial extends PesosTreinoState {}
 class PesosTreinoLoading extends PesosTreinoState {}
 
 class PesosTreinoLoaded extends PesosTreinoState {
-  final List<PesosTreino> pesosTreino;
+  final List<PesosTreino> pesosTreinos;
 
-  const PesosTreinoLoaded(this.pesosTreino);
+  const PesosTreinoLoaded(this.pesosTreinos);
 
   @override
-  List<Object?> get props => [pesosTreino];
+  List<Object?> get props => [pesosTreinos];
 }
 
 class PesosTreinoError extends PesosTreinoState {

@@ -1,7 +1,5 @@
 import 'package:equatable/equatable.dart';
-
 import '../../models/treino_model/peso_treino.dart';
-
 
 abstract class PesosTreinoEvent extends Equatable {
   const PesosTreinoEvent();
@@ -19,10 +17,10 @@ class LoadPesosTreino extends PesosTreinoEvent {
   List<Object?> get props => [userId];
 }
 
-class CreatePesosTreino extends PesosTreinoEvent {
+class AddPesosTreino extends PesosTreinoEvent {
   final PesosTreino pesosTreino;
 
-  const CreatePesosTreino(this.pesosTreino);
+  const AddPesosTreino(this.pesosTreino);
 
   @override
   List<Object?> get props => [pesosTreino];
@@ -35,13 +33,4 @@ class UpdatePesosTreino extends PesosTreinoEvent {
 
   @override
   List<Object?> get props => [pesosTreino];
-}
-
-class DeletePesosTreino extends PesosTreinoEvent {
-  final int id;
-
-  const DeletePesosTreino(this.id);
-
-  @override
-  List<Object?> get props => [id];
 }

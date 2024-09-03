@@ -54,3 +54,13 @@ class DeletePacoteTreino extends PacoteTreinoEvent {
   @override
   List<Object?> get props => [id];
 }
+
+class GetPacoteTreinoIdByAlunoIdAndTreinoId extends PacoteTreinoEvent {
+  final int alunoId;
+  final int treinoId;
+
+  const GetPacoteTreinoIdByAlunoIdAndTreinoId(this.alunoId, this.treinoId);
+
+  @override
+  List<Object?> get props => [alunoId, treinoId];
+}

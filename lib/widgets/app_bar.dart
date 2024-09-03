@@ -85,24 +85,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               actions: [
                 IconButton(
                   icon: Icon(
-                    Icons.message,
-                    color: themeState.themeData.iconTheme.color,
-                  ),
-                  onPressed: () {
-                    // Implementar notificações
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.notifications,
-                    color: themeState.themeData.iconTheme.color,
-                  ),
-                  onPressed: () {
-                    // Implementar notificações
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
                     themeState.isLightTheme ? Icons.brightness_3 : Icons.wb_sunny,
                     color: themeState.themeData.iconTheme.color,
                   ),

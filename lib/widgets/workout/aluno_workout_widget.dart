@@ -1,18 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:guido_power_academia/blocs/treino/user_pacote_treino_bloc.dart';
 import '../../blocs/treino/pacote_bloc.dart';
 import '../../blocs/treino/pacote_event.dart';
 import '../../blocs/treino/pacote_state.dart';
 import '../../blocs/treino/pacote_treino_bloc.dart';
 import '../../blocs/treino/pacote_treino_event.dart';
 import '../../blocs/treino/pacote_treino_state.dart';
+import '../../blocs/treino/pesos_treino_bloc.dart';
+import '../../blocs/treino/pesos_treino_event.dart';
+import '../../blocs/treino/pesos_treino_state.dart';
 import '../../blocs/treino/treino_bloc.dart';
 import '../../blocs/treino/treino_event.dart';
 import '../../blocs/treino/treino_state.dart';
+import '../../blocs/treino/historico_treino_bloc.dart';
+import '../../blocs/treino/historico_treino_event.dart';
+import '../../blocs/treino/historico_treino_state.dart';
+import '../../blocs/treino/user_pacote_treino_bloc.dart';
 import '../../blocs/treino/user_pacote_treino_event.dart';
 import '../../blocs/treino/user_pacote_treino_state.dart';
 import '../../blocs/user/user_bloc.dart';
+import '../../models/treino_model/historico_treino.dart';
+import '../../models/treino_model/peso_treino.dart';
 
 class AlunoWorkoutWidget extends StatefulWidget {
   const AlunoWorkoutWidget({super.key});
@@ -22,26 +30,23 @@ class AlunoWorkoutWidget extends StatefulWidget {
 }
 
 class _AlunoWorkoutWidgetState extends State<AlunoWorkoutWidget> {
-  int? _selectedPacoteId;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadInitialData();
-  }
-
-  void _loadInitialData() {
-    final userBloc = context.read<UserBloc>();
-    final userState = userBloc.state;
-
-    if (userState is UserLoaded) {
-      final userId = userState.user.id;
-      context.read<UserPacoteTreinoBloc>().add(LoadUserPacotesTreino(userId!));
-    }
-  }
+  bool isPacoteInitialized = false;
+  Map<int, bool> treinoIniciado = {};
+  Map<int, bool> treinoConcluido = {};
 
   @override
   Widget build(BuildContext context) {
+    final userBloc = context.read<UserBloc>();
+    final userState = userBloc.state;
+    int? userId;
+
+    if (userState is UserLoaded) {
+      userId = userState.user.id;
+      context.read<UserPacoteTreinoBloc>().add(LoadUserPacotesTreino(userId!));
+      context.read<HistoricoTreinoBloc>().add(LoadHistoricoTreino());
+      context.read<PesosTreinoBloc>().add(LoadPesosTreino(userId));
+    }
+
     return BlocBuilder<UserPacoteTreinoBloc, UserPacoteTreinoState>(
       builder: (context, userPacoteTreinoState) {
         if (userPacoteTreinoState is UserPacoteTreinoLoading) {
@@ -71,16 +76,10 @@ class _AlunoWorkoutWidgetState extends State<AlunoWorkoutWidget> {
               } else if (pacoteState is PacotesLoaded) {
                 final pacotes = pacoteState.pacotes;
 
-                if (_selectedPacoteId == null && pacotes.isNotEmpty) {
-                  _selectedPacoteId = pacotes.first.id;
-                  context.read<PacoteTreinoBloc>().add(LoadPacoteTreinosById(_selectedPacoteId!));
-                }
-
-                if (_selectedPacoteId != null &&
-                    !pacotes.map((p) => p.id).contains(_selectedPacoteId)) {
-                  _selectedPacoteId = pacotes.first.id;
-                  context.read<PacoteTreinoBloc>().add(LoadPacoteTreinosById(_selectedPacoteId!));
-                }
+                int selectedPacoteId = pacotes.first.id!;
+                context
+                    .read<PacoteTreinoBloc>()
+                    .add(LoadPacoteTreinosById(selectedPacoteId));
 
                 return Column(
                   children: [
@@ -93,13 +92,11 @@ class _AlunoWorkoutWidgetState extends State<AlunoWorkoutWidget> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                         ),
-                        value: _selectedPacoteId,
+                        value: selectedPacoteId,
                         onChanged: (int? newValue) {
-                          setState(() {
-                            _selectedPacoteId = newValue;
-                          });
-                          context.read<PacoteTreinoBloc>().add(
-                              LoadPacoteTreinosById(_selectedPacoteId!));
+                          context
+                              .read<PacoteTreinoBloc>()
+                              .add(LoadPacoteTreinosById(newValue!));
                         },
                         items: pacotes.map<DropdownMenuItem<int>>((pacote) {
                           return DropdownMenuItem<int>(
@@ -107,7 +104,8 @@ class _AlunoWorkoutWidgetState extends State<AlunoWorkoutWidget> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('${pacote.letraDivisao} - ${pacote.tipoTreino}'),
+                                Text(
+                                    '${pacote.letraDivisao} - ${pacote.tipoTreino}'),
                               ],
                             ),
                           );
@@ -124,7 +122,9 @@ class _AlunoWorkoutWidgetState extends State<AlunoWorkoutWidget> {
                           } else if (pacoteTreinoState is TreinoIdsLoaded) {
                             final treinoIds = pacoteTreinoState.treinoIds;
 
-                            context.read<TreinoBloc>().add(LoadTreinosByIds(treinoIds));
+                            context
+                                .read<TreinoBloc>()
+                                .add(LoadTreinosByIds(treinoIds));
 
                             return BlocBuilder<TreinoBloc, TreinoState>(
                               builder: (context, treinoState) {
@@ -138,25 +138,100 @@ class _AlunoWorkoutWidgetState extends State<AlunoWorkoutWidget> {
                                     itemCount: treinos.length,
                                     itemBuilder: (context, index) {
                                       final treino = treinos[index];
-                                      return Card(
-                                        child: ListTile(
-                                          title: Text(treino.nome),
-                                          subtitle: Text(
-                                            '${treino.qtdSeries} x ${treino.qtdRepeticoes}',
-                                          ),
-                                          trailing: IconButton(
-                                            icon: const Icon(Icons.expand_more),
-                                            onPressed: () {
-                                              // Implementar a função de expandir aqui
-                                            },
-                                          ),
-                                        ),
+                                      return BlocBuilder<PesosTreinoBloc, PesosTreinoState>(
+                                        builder: (context, pesosTreinoState) {
+                                          final pesoTreinoSalvo = (pesosTreinoState is PesosTreinoLoaded)
+                                              ? pesosTreinoState.pesosTreinos.firstWhere(
+                                                  (peso) => peso.pacoteTreinoId == treino.id,
+                                                  orElse: () => PesosTreino(
+                                                    createdAt: DateTime.now(),
+                                                    pacoteTreinoId: treino.id!,
+                                                    userId: userId!,
+                                                  ),
+                                                )
+                                              : null;
+
+                                          final isTrainingStarted = treinoIniciado[treino.id!] ?? false;
+                                          final isTrainingCompleted = treinoConcluido[treino.id!] ?? false;
+
+                                          return Card(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(8.0),
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(treino.nome),
+                                                  const SizedBox(height: 4),
+                                                  Text('${treino.qtdSeries} x ${treino.qtdRepeticoes}'),
+                                                  const SizedBox(height: 8),
+                                                  Row(
+                                                    children: [
+                                                      SizedBox(
+                                                        width: 100,
+                                                        child: TextFormField(
+                                                          initialValue: pesoTreinoSalvo?.peso?.toString(),
+                                                          onChanged: (value) {
+                                                            final pesoAtualizado = PesosTreino(
+                                                              id: pesoTreinoSalvo?.id,
+                                                              createdAt: DateTime.now(),
+                                                              pacoteTreinoId: treino.id!,
+                                                              peso: int.tryParse(value),
+                                                              userId: userId!,
+                                                            );
+                                                            context.read<PesosTreinoBloc>().add(UpdatePesosTreino(pesoAtualizado));
+                                                          },
+                                                          decoration: const InputDecoration(
+                                                            labelText: 'Peso (kg)',
+                                                            border: OutlineInputBorder(),
+                                                          ),
+                                                          keyboardType: TextInputType.number,
+                                                          enabled: isTrainingStarted && !isTrainingCompleted,
+                                                        ),
+                                                      ),
+                                                      const Spacer(),
+                                                      if (isPacoteInitialized)
+                                                        ElevatedButton(
+                                                          onPressed: isTrainingCompleted
+                                                              ? null
+                                                              : () {
+                                                                  setState(() {
+                                                                    treinoIniciado[treino.id!] = !isTrainingStarted;
+                                                                    treinoConcluido[treino.id!] = !treinoIniciado[treino.id!]!;
+                                                                  });
+
+                                                                  final pesoTreino = PesosTreino(
+                                                                    createdAt: DateTime.now(),
+                                                                    pacoteTreinoId: treino.id!,
+                                                                    userId: userId!,
+                                                                    peso: pesoTreinoSalvo?.peso,
+                                                                  );
+                                                                  if (isTrainingStarted) {
+                                                                    context.read<PesosTreinoBloc>().add(UpdatePesosTreino(pesoTreino));
+                                                                  } else {
+                                                                    context.read<PesosTreinoBloc>().add(AddPesosTreino(pesoTreino));
+                                                                  }
+                                                                },
+                                                          style: ElevatedButton.styleFrom(
+                                                            backgroundColor: isTrainingCompleted
+                                                                ? Colors.grey
+                                                                : isTrainingStarted
+                                                                    ? Colors.green
+                                                                    : Colors.blue,
+                                                          ),
+                                                          child: Text(isTrainingStarted ? 'Concluir Treino' : 'Iniciar Treino'),
+                                                        ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
                                       );
                                     },
                                   );
                                 } else {
-                                  return const Center(
-                                      child: CircularProgressIndicator());
+                                  return const Center(child: CircularProgressIndicator());
                                 }
                               },
                             );
@@ -167,25 +242,68 @@ class _AlunoWorkoutWidgetState extends State<AlunoWorkoutWidget> {
                         },
                       ),
                     ),
+                    BlocBuilder<HistoricoTreinoBloc, HistoricoTreinoState>(
+                      builder: (context, historicoState) {
+                        int timeInSeconds = 0;
+                        if (historicoState is WorkoutTimeUpdated) {
+                          timeInSeconds = historicoState.timeInSeconds;
+                        }
+                        return Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                if (historicoState is WorkoutTimeStopped || historicoState is WorkoutTimeUpdated) {
+                                  context.read<HistoricoTreinoBloc>().add(StopWorkoutTimer());
+                                  final historicoTreino = HistoricoTreino(
+                                    createdAt: DateTime.now(),
+                                    tempoTreino: _formatTime(timeInSeconds),
+                                    pacoteTreinoId: selectedPacoteId,
+                                    alunoId: userId!,
+                                  );
+                                  context.read<HistoricoTreinoBloc>().add(SaveWorkoutTime(historicoTreino));
+                                  setState(() {
+                                    isPacoteInitialized = false;
+                                    treinoIniciado.clear();
+                                    treinoConcluido.clear();
+                                  });
+                                } else {
+                                  context.read<HistoricoTreinoBloc>().add(StartWorkoutTimer());
+                                  setState(() {
+                                    isPacoteInitialized = true;
+                                  });
+                                }
+                              },
+                              child: Text(
+                                historicoState is WorkoutTimeStopped || historicoState is HistoricoTreinoLoaded
+                                    ? 'Iniciar Pacote'
+                                    : 'Concluir Pacote: ${_formatTime(timeInSeconds)}',
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                   ],
                 );
               } else if (pacoteState is PacoteError) {
-                return Center(
-                    child: Text(
-                        'Erro ao carregar os pacotes: ${pacoteState.message}'));
+                return Center(child: Text('Erro ao carregar os pacotes: ${pacoteState.message}'));
               } else {
                 return const Center(child: CircularProgressIndicator());
               }
             },
           );
         } else if (userPacoteTreinoState is UserPacoteTreinoError) {
-          return Center(
-              child: Text(
-                  'Erro ao carregar pacotes de treino: ${userPacoteTreinoState.message}'));
+          return Center(child: Text('Erro ao carregar pacotes de treino: ${userPacoteTreinoState.message}'));
         } else {
           return const Center(child: CircularProgressIndicator());
         }
       },
     );
+  }
+
+  String _formatTime(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return '$minutes:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 }

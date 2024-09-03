@@ -1,14 +1,14 @@
 class PesosTreino {
   final int? id;
   final DateTime createdAt;
-  final int treinoId;
+  final int pacoteTreinoId;
   final int? peso;
   final int userId;
 
   PesosTreino({
     this.id,
     required this.createdAt,
-    required this.treinoId,
+    required this.pacoteTreinoId,
     this.peso,
     required this.userId,
   });
@@ -17,7 +17,7 @@ class PesosTreino {
     return PesosTreino(
       id: map['id'],
       createdAt: DateTime.parse(map['createdAt']),
-      treinoId: map['treinoId'],
+      pacoteTreinoId: map['pacoteTreinoId'],
       peso: map['peso'],
       userId: map['userId'],
     );
@@ -27,7 +27,7 @@ class PesosTreino {
     return {
       'id': id,
       'createdAt': createdAt.toIso8601String(),
-      'treinoId': treinoId,
+      'pacoteTreinoId': pacoteTreinoId,
       'peso': peso,
       'userId': userId,
     };

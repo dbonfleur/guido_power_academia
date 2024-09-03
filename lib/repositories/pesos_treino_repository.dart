@@ -17,6 +17,12 @@ class PesosTreinoRepository {
     return result.map((e) => PesosTreino.fromMap(e)).toList();
   }
 
+  Future<List<PesosTreino>> getPesosTreinoByPacoteTreinoId(int pacoteTreinoId) async {
+    final db = await databaseHelper.database;
+    final result = await db.query('pesos_treino', where: 'pacoteTreinoId = ?', whereArgs: [pacoteTreinoId]);
+    return result.map((e) => PesosTreino.fromMap(e)).toList();
+  }
+
   Future<int> updatePesosTreino(PesosTreino pesosTreino) async {
     final db = await databaseHelper.database;
     return await db.update('pesos_treino', pesosTreino.toMap(), where: 'id = ?', whereArgs: [pesosTreino.id]);

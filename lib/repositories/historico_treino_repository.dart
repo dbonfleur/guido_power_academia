@@ -13,7 +13,7 @@ class HistoricoTreinoRepository {
 
   Future<List<HistoricoTreino>> getHistoricoTreinoByUserPacoteTreinoId(int userPacoteTreinoId) async {
     final db = await databaseHelper.database;
-    final result = await db.query('historico_treino', where: 'userPacoteTreinoId = ?', whereArgs: [userPacoteTreinoId]);
+    final result = await db.query('historico_treino', where: 'pacoteTreinoId = ?', whereArgs: [userPacoteTreinoId]);
     return result.map((e) => HistoricoTreino.fromMap(e)).toList();
   }
 

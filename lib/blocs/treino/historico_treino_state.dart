@@ -1,8 +1,5 @@
 import 'package:equatable/equatable.dart';
 
-import '../../models/treino_model/historico_treino.dart';
-
-
 abstract class HistoricoTreinoState extends Equatable {
   const HistoricoTreinoState();
 
@@ -14,13 +11,26 @@ class HistoricoTreinoInitial extends HistoricoTreinoState {}
 
 class HistoricoTreinoLoading extends HistoricoTreinoState {}
 
-class HistoricoTreinoLoaded extends HistoricoTreinoState {
-  final List<HistoricoTreino> historicoTreino;
+class HistoricoTreinoLoaded extends HistoricoTreinoState {}
 
-  const HistoricoTreinoLoaded(this.historicoTreino);
+class WorkoutTimeStarted extends HistoricoTreinoState {}
+
+class WorkoutTimeStopped extends HistoricoTreinoState {
+  final int totalTimeInSeconds;
+
+  const WorkoutTimeStopped(this.totalTimeInSeconds);
 
   @override
-  List<Object?> get props => [historicoTreino];
+  List<Object?> get props => [totalTimeInSeconds];
+}
+
+class WorkoutTimeUpdated extends HistoricoTreinoState {
+  final int timeInSeconds;
+
+  const WorkoutTimeUpdated(this.timeInSeconds);
+
+  @override
+  List<Object?> get props => [timeInSeconds];
 }
 
 class HistoricoTreinoError extends HistoricoTreinoState {
