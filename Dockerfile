@@ -1,43 +1,29 @@
-FROM debian:stable-slim
+FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install -y \
-    wget \
-    unzip \
-    git \
-    curl \
-    xz-utils \
-    libglu1-mesa \
-    cmake \
-    ninja-build \
-    clang \
-    build-essential \
-    libgtk-3-dev \
-    libblkid-dev \
-    liblzma-dev \
-    gdb \
-    lcov \
-    pkg-config \
-    libssl-dev \
-    && apt-get clean
+# Prerequisites
+RUN apt update && apt install -y curl git unzip xz-utils zip libglu1-mesa openjdk-8-jdk wget cmake ninja-build clang pkg-config libgtk-3-dev x11-apps sudo sqlite3 libsqlite3-dev
 
-RUN wget https://storage.googleapis.com/dart-archive/channels/stable/release/3.5.1/sdk/dartsdk-linux-x64-release.zip -O /tmp/dartsdk.zip \
-    && unzip /tmp/dartsdk.zip -d /usr/lib \
-    && rm /tmp/dartsdk.zip
+# Set up new user
+RUN useradd -ms /bin/bash developer
+USER developer
+WORKDIR /home/developer
 
-ENV PATH="/usr/lib/dart-sdk/bin:$PATH"
+# Prepare Android directories and system variables
+RUN mkdir -p Android/sdk
+ENV ANDROID_SDK_ROOT /home/developer/Android/sdk
+RUN mkdir -p .android && touch .android/repositories.cfg
 
-RUN dart --version
+# Set up Android SDK
+RUN wget -O sdk-tools.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
+RUN unzip sdk-tools.zip && rm sdk-tools.zip
+RUN mv tools Android/sdk/tools
+RUN cd Android/sdk/tools/bin && yes | ./sdkmanager --licenses
+RUN cd Android/sdk/tools/bin && ./sdkmanager "build-tools;29.0.2" "platform-tools" "platforms;android-29" "sources;android-29"
+ENV PATH "$PATH:/home/developer/Android/sdk/platform-tools"
 
-RUN git clone https://github.com/flutter/flutter.git -b stable --depth 1 /usr/local/flutter
+# Download Flutter SDK
+RUN git clone https://github.com/flutter/flutter.git
+ENV PATH "$PATH:/home/developer/flutter/bin"
 
-ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$PATH"
-
-WORKDIR /app
-
-COPY . .
-
-RUN flutter pub get
-
-EXPOSE 8080
-
-CMD ["flutter", "run"]
+# Run basic check to download Dark SDK
+RUN flutter doctor

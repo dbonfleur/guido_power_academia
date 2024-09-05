@@ -1,0 +1,18 @@
+{
+  "name": "guido_power_academia_docker",
+  "context": "..",
+  "dockerFile": "../Dockerfile",
+  "remoteUser": "developer",
+  "mounts": ["source=/dev/bus/usb,target=/dev/bus/usb,type=bind"],
+  "runArgs": [
+    "-e",
+    "DISPLAY=172.20.240.1:0",
+    "--privileged",
+  ],
+  "settings": {
+    "terminal.integrated.shell.linux": null
+  },
+  "extensions": ["dart-code.flutter"],
+  "workspaceMount": "source=D:/GitHub/guido_power_academia/workspace,target=/home/developer/workspace,type=bind,consistency=delegated",
+  "workspaceFolder": "/home/developer/workspace"
+}

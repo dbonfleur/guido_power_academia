@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/authentication/authentication_bloc.dart';
 import '../blocs/search/search_bloc.dart';
 import '../blocs/search/search_state.dart';
+import '../blocs/theme/theme_bloc.dart';
 import '../blocs/treino/pacote_bloc.dart';
 import '../blocs/treino/pacote_event.dart';
 import '../blocs/treino/pacote_state.dart';
@@ -48,8 +49,14 @@ class _StudentScreenState extends State<StudentScreen> {
                         child: Row(
                           children: [
                             CircleAvatar(
-                              backgroundImage: MemoryImage(base64Decode(user.imageUrl)),
+                              backgroundColor: Colors.white,
+                              backgroundImage: user.imageUrl != null 
+                                    ? MemoryImage(base64Decode(user.imageUrl)) 
+                                    : null,
                               radius: 20,
+                              child: user.imageUrl == null
+                                    ? Icon(Icons.person, color: context.read<ThemeBloc>().state.themeData.appBarTheme.backgroundColor)
+                                    : null,
                             ),
                             const SizedBox(width: 8.0),
                             Text(user.fullName),
